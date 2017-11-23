@@ -1,4 +1,4 @@
-group 'com.cricket.australia'
+group "com.cricket.australia"
 version '1.0-SNAPSHOT'
 
 apply plugin: 'java'
@@ -10,6 +10,18 @@ mainClassName = "com.cricket.australia.Main"
 
 repositories {
     mavenCentral()
+}
+
+// create a single Jar with all dependencies
+jar {
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    manifest {
+        attributes("Main-Class" : "Main" )
+    }
 }
 
 dependencies {
