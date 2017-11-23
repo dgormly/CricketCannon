@@ -1,0 +1,41 @@
+.jfx-date-picker .jfx-text-field {
+    -jfx-unfocus-color: '#1D4161';
+    -fx-text-fill: '#1D4161';
+    -fx-font-size: 18;
+}
+
+.timeSelected {
+    -fx-fill: '#D91636';
+}
+
+.hourNodes {
+    -fx-fill: '#3AABC7';
+}
+
+.minuteNodes {
+    -fx-fill: '#0975BA';
+}
+
+.minNodes {
+    -fx-fill: '#0975BA';
+}
+
+.jfx-hamburger StackPane {
+    -fx-background-color: white;
+}
+
+.drawer {
+    -fx-background-color: '#D91636';
+}
+
+.okButton {
+    -fx-background-color: '#1D4161';
+}
+
+.fireButton {
+    -fx-background-color: '#BEDB39';
+}
+
+.stopButton {
+    -fx-background-color: 'D91636';
+}
