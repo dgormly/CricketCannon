@@ -1,32 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
 <?import com.jfoenix.controls.JFXDrawer?>
 <?import com.jfoenix.controls.JFXTreeTableView?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="windowBorderPane" prefHeight="396.0" prefWidth="721.0" style="-fx-background-color: #1D4161;" xmlns="http://javafx.com/javafx/8.0.111" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainWindowController">
+<BorderPane fx:id="windowBorderPane" prefHeight="396.0" prefWidth="721.0" style="-fx-background-color: #1D4161;" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainWindowController">
    <center>
       <AnchorPane fx:id="backgroundPane" prefHeight="323.0" prefWidth="757.0" stylesheets="@css/main.css" BorderPane.alignment="CENTER">
          <children>
             <JFXDrawer fx:id="drawer" defaultDrawerSize="180.0" layoutY="7.0" prefHeight="365.0" prefWidth="180.0" stylesheets="@css/main.css" />
-            <JFXTreeTableView layoutX="-1.0" layoutY="75.0" prefHeight="311.0" prefWidth="673.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+            <JFXTreeTableView fx:id="tableView" layoutX="-1.0" layoutY="75.0" prefHeight="311.0" prefWidth="673.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <columns>
+                  <TreeTableColumn prefWidth="44.0" text="ID" />
+                  <TreeTableColumn prefWidth="176.0" text="Ball Brand" />
+                  <TreeTableColumn minWidth="5.0" prefWidth="70.0" text="Shot #" />
+                  <TreeTableColumn minWidth="6.0" prefWidth="70.0" text="Speed 1" />
+                  <TreeTableColumn prefWidth="70.0" text="Speed 2" />
+               </columns></JFXTreeTableView>
          </children>
       </AnchorPane>
    </center>
    <top>
-      <AnchorPane BorderPane.alignment="CENTER">
+      <AnchorPane stylesheets="@css/main.css" BorderPane.alignment="CENTER">
          <children>
             <Label fx:id="timeLabel" alignment="CENTER" layoutX="219.0" layoutY="10.0" prefHeight="30.0" prefWidth="283.0" text="Cannon Controller" textFill="WHITE" AnchorPane.bottomAnchor="10.0" AnchorPane.topAnchor="10.0">
                <font>
                   <Font name="Arial Bold" size="25.0" />
                </font>
             </Label>
-            <JFXButton fx:id="fireButton" layoutX="587.0" layoutY="12.0" stylesheets="@css/main.css" text="Fire" AnchorPane.leftAnchor="20.0" />
-            <JFXButton fx:id="stopButton" layoutX="465.0" layoutY="12.0" styleClass="testButtons" stylesheets="@css/main.css" text="Stop" AnchorPane.rightAnchor="20.0" />
+            <JFXButton fx:id="fireButton" layoutX="585.0" layoutY="12.0" prefWidth="50.0" styleClass="fireButton" stylesheets="@css/main.css" text="Fire" AnchorPane.rightAnchor="90.0" />
+            <JFXButton fx:id="stopButton" disable="true" layoutX="465.0" layoutY="12.0" prefWidth="50.0" styleClass="stopButton" stylesheets="@css/main.css" text="Stop" AnchorPane.rightAnchor="20.0" />
+            <JFXComboBox layoutX="14.0" layoutY="12.0" prefHeight="27.0" prefWidth="140.0" promptText="USB Port" stylesheets="@css/main.css" />
          </children>
       </AnchorPane>
    </top>
