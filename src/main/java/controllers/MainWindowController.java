@@ -6,8 +6,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
+import javafx.scene.control.Label;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import util.ShotRecord;
@@ -47,6 +52,7 @@ public class MainWindowController implements Initializable {
     private JFXTextField fileLocationTextField;
     @FXML
     private JFXButton fileSelectButton;
+
 //    @FXML
 //    private JFXTreeTableView<ShotRecord> dataTreeTableView;
 //    @FXML
@@ -66,6 +72,7 @@ public class MainWindowController implements Initializable {
     private File file;
     private int numBalls;
     private int numShots;
+    private StackPane sp = new StackPane();
 
     public MainWindowController() throws InterruptedException {
     }
@@ -83,6 +90,7 @@ public class MainWindowController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        sp.setAlignment(Pos.CENTER_LEFT);
 
         fireButton.setOnAction(e -> {
             fireCannon();
@@ -109,6 +117,7 @@ public class MainWindowController implements Initializable {
         usbCombo.setOnAction(e -> {
             if (usbDao.getPort() != null && usbDao.getPort().isOpen()) {
                 usbDao.getPort().closePort();
+                usbDao.setSetup(false);
             }
             usbDao.setPort(usbCombo.getValue());
         });
@@ -128,11 +137,11 @@ public class MainWindowController implements Initializable {
     }
 
     private boolean fireCannon() {
-        usbDao.sendMessage("#Fire!");
-        if (checkParams()) {
-            stopButton.setDisable(false);
-            fireButton.setDisable(true);
-            return true;
+            if (checkParams()) {
+                usbDao.sendMessage("#Fire!");
+                stopButton.setDisable(false);
+                fireButton.setDisable(true);
+                return true;
         } else {
             return false;
         }
@@ -179,16 +188,26 @@ public class MainWindowController implements Initializable {
 
 
     private boolean checkParams() {
+
+        if (fileLocationTextField.getText() == "") return false;
+        if (usbDao.getPort() == null) return false;
+        if (fileLocationTextField.getText() == "") return false;
+        if (!usbDao.isSetup()) return false;
+
+
         try {
             numBalls = Integer.parseInt(numBallsTextfield.getText());
             numShots = Integer.parseInt(numShotsTextField.getText());
+            file = new File(fileLocationTextField.getText());
         } catch (Exception e) {
             return false;
         }
-        if (fileLocationTextField.getText() != "" && usbDao.getPort() != null) {
-            return true;
-        }
-        return false;
+
+        if (numBalls <= 0) return false;
+        if (numShots <= 0) return false;
+
+
+        return true;
     }
 
 

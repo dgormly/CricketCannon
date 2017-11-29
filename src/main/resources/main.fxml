@@ -22,7 +22,7 @@
                <children>
                   <TitledPane animated="false" collapsible="false" prefHeight="331.0" prefWidth="502.0" style="-fx-background-color: #D91636;" text="Settings">
                     <content>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="137.0" prefWidth="500.0" style="-fx-background-color: #1D4161;">
+                      <AnchorPane fx:id="settingsAP" minHeight="0.0" minWidth="0.0" prefHeight="137.0" prefWidth="500.0" style="-fx-background-color: #1D4161;">
                            <children>
                               <JFXButton fx:id="fireButton" layoutX="370.0" layoutY="100.0" prefWidth="50.0" styleClass="fireButton" stylesheets="@css/main.css" text="Fire" AnchorPane.bottomAnchor="10.0" />
                               <JFXButton fx:id="stopButton" disable="true" layoutX="418.0" layoutY="93.0" prefWidth="50.0" styleClass="stopButton" stylesheets="@css/main.css" text="Stop" AnchorPane.bottomAnchor="10.0" AnchorPane.rightAnchor="10.0" />

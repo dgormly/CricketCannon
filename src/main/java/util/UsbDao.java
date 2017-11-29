@@ -11,6 +11,7 @@ public class UsbDao {
     private String PORT_NAME = "IOUSBHostDevice"; // Name of IR dongle
     private int BUAD_RATE = 9600; // How fast is the baud rate of to send data at.
     private String response = "";
+    private boolean setup = false;
 
     private SerialPort comPort;
 
@@ -74,6 +75,12 @@ public class UsbDao {
                 response += new String(newData);
                 if (response.contains("!")) {
                     // Fire event and clear response.
+
+                    switch (response) {
+                        case "Setup!":
+                            setup = true;
+                    }
+
                     System.out.println(response);
                     response = "";
                 }
@@ -85,14 +92,26 @@ public class UsbDao {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        if (comPort != null && comPort.isOpen()) {
-            System.out.println("COMs setup successfully.");
-        } else {
+
+        if (comPort == null || !comPort.isOpen()) {
             System.out.println("COMs failed to setup.");
         }
+
+        if (!setup) {
+            sendMessage("#Setup!");
+        }
+
         return comPort;
     }
 
+
+    public boolean isSetup() {
+        return setup;
+    }
+
+    public void setSetup(boolean setup) {
+        this.setup = setup;
+    }
 
     /**
      * Sends message.
