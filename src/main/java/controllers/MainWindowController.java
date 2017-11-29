@@ -53,6 +53,7 @@ public class MainWindowController implements Initializable {
     @FXML
     private JFXButton fileSelectButton;
 
+    //TODO Implement Records table.
 //    @FXML
 //    private JFXTreeTableView<ShotRecord> dataTreeTableView;
 //    @FXML
@@ -68,11 +69,9 @@ public class MainWindowController implements Initializable {
 
     private ObservableList<String> comList;
     private UsbDao usbDao = new UsbDao();
-    // Settings
     private File file;
     private int numBalls;
     private int numShots;
-    private StackPane sp = new StackPane();
 
     public MainWindowController() throws InterruptedException {
     }
@@ -90,8 +89,8 @@ public class MainWindowController implements Initializable {
      */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        sp.setAlignment(Pos.CENTER_LEFT);
 
+        /* Setup event handlers. */
         fireButton.setOnAction(e -> {
             fireCannon();
         });
@@ -105,7 +104,7 @@ public class MainWindowController implements Initializable {
             findFilePath();
         });
 
-
+        // Load ports.
         List<String> comNames = new ArrayList<>();
         for (SerialPort serialPort : SerialPort.getCommPorts()) {
             comNames.add(serialPort.getDescriptivePortName());
@@ -136,6 +135,13 @@ public class MainWindowController implements Initializable {
 
     }
 
+    /**
+     * Fires the cannon if all parameters are valid.
+     *
+     * @return
+     *      True if cannon fires
+     *      False otherwise
+     */
     private boolean fireCannon() {
             if (checkParams()) {
                 usbDao.sendMessage("#Fire!");
@@ -148,10 +154,13 @@ public class MainWindowController implements Initializable {
     }
 
 
-    private boolean stopCannon() {
+    /**
+     * Stops the cannon sequence.
+     *
+     */
+    private void stopCannon() {
         stopButton.setDisable(true);
         fireButton.setDisable(false);
-        return true;
     }
 
 
@@ -173,6 +182,14 @@ public class MainWindowController implements Initializable {
     }
 
 
+    /**
+     * Exports data to given CSV file.
+     *
+     * TODO Don't know if I am going to need this. Link at the end.
+     *
+     * @param content
+     * @param file
+     */
     private void saveFile(String content, File file){
         try {
             FileWriter fileWriter = null;
@@ -187,6 +204,13 @@ public class MainWindowController implements Initializable {
     }
 
 
+    /**
+     * Checks if the given cannon parameters are valid.
+     *
+     * @return
+     *      True if all parameters are valid
+     *      False otherwise.
+     */
     private boolean checkParams() {
 
         if (fileLocationTextField.getText() == "") return false;
@@ -211,11 +235,12 @@ public class MainWindowController implements Initializable {
     }
 
 
-    private ShotRecord getShotData() {
-        return null;
-    }
-
-
+    /**
+     * Adds a new record to the data table and CSV file.
+     *
+     * @param record
+     *      Record to add.
+     */
     private void addRecord(ShotRecord record) {
         // TODO add record to table.
 

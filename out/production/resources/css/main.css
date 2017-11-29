@@ -25,13 +25,24 @@
 }
 
 .drawer {
-    -fx-background-color: '#D91636';
+    -fx-background-color: '#3AABC7';
 }
 
 .okButton {
     -fx-background-color: '#1D4161';
 }
 
-.testButtons {
-    -fx-background-color: '#3AABC7';
+.fireButton {
+    -fx-background-color: '#BEDB39';
+}
+
+
+.stopButton {
+    -fx-background-color: 'D91636';
+}
+
+.combo-box > .list-cell {
+-fx-background: black;
+-fx-background-color: '#3AABC7';
+-fx-text-fill: white;
 }

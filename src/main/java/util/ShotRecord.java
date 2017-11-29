@@ -19,4 +19,24 @@ public class ShotRecord extends RecursiveTreeObject<ShotRecord> {
         this.shotNum = shotNum;
         this.time = time;
     }
+
+    public double getTime1() {
+        return time1;
+    }
+
+    public double getTime2() {
+        return time2;
+    }
+
+    public int getUid() {
+        return uid;
+    }
+
+    public int getShotNum() {
+        return shotNum;
+    }
+
+    public Date getTime() {
+        return time;
+    }
 }
