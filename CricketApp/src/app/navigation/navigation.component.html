@@ -1,0 +1,12 @@
+<mat-toolbar color="primary" class="mat-elevation-z16">
+  <span>{{title}}
+    <a mat-button routerLink="/Fire">Fire Cannon</a>
+  </span>
+  <span class="span-spacer"></span>
+  <button mat-raised-button *ngIf="toggled"
+  (click)="fire()"
+  color="warn"
+  class="fire-form">
+Stop
+</button>
+</mat-toolbar>

@@ -1,0 +1,116 @@
+<mat-expansion-panel 
+[expanded]="!toggled"
+(opened)= "toggleOff()"
+ class="mat-elevation-z8" id="fire-form">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Cannon Settings
+        </mat-panel-title>
+        <mat-panel-description>
+          Cannon Wizard
+        </mat-panel-description>
+      </mat-expansion-panel-header>       
+            <mat-horizontal-stepper [linear]="isLinear">
+              <mat-step>
+                <form>
+                  <ng-template matStepLabel>Cannon Settings</ng-template>
+
+                  <mat-form-field>
+                      <mat-select placeholder="Comm Port" [(value)]="selectedPort">
+                        <div *ngIf="portNames">
+                          <mat-option *ngFor="let port of portNames" [value]="port.comName">
+                            {{ port.comName }}
+                          </mat-option>
+                      </div>
+                      </mat-select>
+                    </mat-form-field>
+                    <br/>
+                    <mat-checkbox [(ngModel)]="checked" [ngModelOptions]="{standalone: true}">
+                        Single Shot
+                    </mat-checkbox>
+                  <div>
+                    <button mat-button matStepperNext>Next</button>
+                  </div>
+                </form>
+              </mat-step>
+              <mat-step>
+                <form>
+                  <ng-template matStepLabel>Ball Settings</ng-template>
+                    <div *ngIf="!checked" class="floating-box">
+                      <mat-form-field>
+                        <mat-label #numShots>Number of shots:</mat-label>
+                        <input matInput [disabled]="toggled" placeholder="# Shots">
+                      </mat-form-field>
+                      <br/>
+                      <mat-form-field>
+                        <mat-label #numBalls>Number of balls:</mat-label>
+                        <input matInput [disabled]="toggled" placeholder="# Balls">
+                      </mat-form-field>
+                    </div>
+                    <div *ngIf="checked">
+                      Continue to Export Settings
+                    </div>
+                  <div>
+                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matStepperNext>Next</button>
+                  </div>
+                </form>
+              </mat-step>
+              <mat-step>
+                  <form>
+                    <ng-template matStepLabel>Fire Cannon</ng-template>
+                    Begin cannon session.
+                    <br/>
+                    <button mat-raised-button=""
+                    [disabled]="toggled"
+                    (click)="fire()"
+                    color="primary"
+                    class="fire-form"  >
+              Start
+            </button>
+            <button mat-raised-button
+                    [disabled]="!toggled"
+                    (click)="fire()"
+                    color="warn"
+                    class="fire-form"  >
+              Stop
+            </button>
+                    <div>
+                      <button mat-button matStepperPrevious [disabled]="toggled">Back</button>
+                      <button mat-button matStepperNext [disabled]="toggled">Next</button>
+                    </div>
+                  </form>
+                </mat-step>
+              <mat-step>
+                <ng-template matStepLabel>Save file</ng-template>
+                Save data to a csv file.
+              <br/>
+                <mat-form-field>
+                  <mat-label>File name</mat-label>
+                  <input matInput #fileLocation placeholder="File name">
+                </mat-form-field>
+                <button mat-button 
+                (click)="saveToCsv(fileLocation.value)"
+              color="primary">Save
+            </button>
+                <div>
+                  <button mat-button matStepperPrevious>Back</button>
+                </div>
+              </mat-step>
+            </mat-horizontal-stepper>
+        <mat-action-row>
+          <button mat-button
+                  (click)="fire()"
+                  color="primary" 
+                  class="fire-form"  >
+            Clear
+          </button>
+          <button mat-button
+                  (click)="fire()"
+                  color="warn"
+                  class="fire-form"  >
+            Reset
+          </button>
+        </mat-action-row> 
+</mat-expansion-panel>
+<app-data></app-data>
