@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import {DataService} from '../data.service';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
-import { SHOTS } from '../mock-shots';
 import {Shot} from '../Shot';
 import {FireService} from '../fire.service';
 

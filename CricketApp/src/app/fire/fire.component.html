@@ -7,7 +7,7 @@
           Cannon Settings
         </mat-panel-title>
         <mat-panel-description>
-          Cannon Wizard
+          Cannon Wizard 
         </mat-panel-description>
       </mat-expansion-panel-header>       
             <mat-horizontal-stepper [linear]="isLinear">
@@ -39,11 +39,11 @@
                     <div *ngIf="!checked" class="floating-box">
                       <mat-form-field>
                         <mat-label #numShots>Number of shots:</mat-label>
-                        <input matInput [disabled]="toggled" placeholder="# Shots">
+                        <input matInput [(ngModel)]="shots"  [ngModelOptions]="{standalone: true}" [disabled]="toggled" placeholder="# Shots">
                       </mat-form-field>
                       <br/>
                       <mat-form-field>
-                        <mat-label #numBalls>Number of balls:</mat-label>
+                        <mat-label #numBall>Number of balls:</mat-label>
                         <input matInput [disabled]="toggled" placeholder="# Balls">
                       </mat-form-field>
                     </div>
@@ -100,7 +100,7 @@
             </mat-horizontal-stepper>
         <mat-action-row>
           <button mat-button
-                  (click)="fire()"
+                  (click)="clear()"
                   color="primary" 
                   class="fire-form"  >
             Clear

@@ -40,14 +40,14 @@ export class FireService {
     }, this.httpOptions).subscribe();
   }
 
-  fireCannon(): void {
-    this.http.get<Shot>('/api/fire')
+  fireCannon(): Observable<Shot> {
+    return this.http.get<Shot>('/api/fire')
     .pipe(tap(data => {
       this.addShot(data)
-    })).subscribe();
+    }));
   }
 
-  isFiring(data: any): void{
+  isFiring(data: boolean): void{
     this.firingSubject.next(data);
   }
 
@@ -61,6 +61,11 @@ export class FireService {
       "headers": ["id", "name"],
       "fileName": filePath
     }, this.httpOptions).subscribe();
+  }
+
+  clearShots(): void {
+    console.log('Clearing shot data.');
+    this.shots.next([]);
   }
 
   private addShot(shot: Shot): void {
