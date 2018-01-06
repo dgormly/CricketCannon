@@ -39,19 +39,19 @@
                     <div *ngIf="!checked" class="floating-box">
                       <mat-form-field>
                         <mat-label #numShots>Number of shots:</mat-label>
-                        <input matInput [(ngModel)]="shots"  [ngModelOptions]="{standalone: true}" [disabled]="toggled" placeholder="# Shots">
+                        <input matInput name="shots" [(ngModel)]="shots" type="number" [disabled]="toggled" placeholder="# Shots">
                       </mat-form-field>
                       <br/>
                       <mat-form-field>
                         <mat-label #numBall>Number of balls:</mat-label>
-                        <input matInput [disabled]="toggled" placeholder="# Balls">
+                        <input matInput name="balls" [(ngModel)]="balls" type="number" [disabled]="toggled" placeholder="# Balls">
                       </mat-form-field>
                     </div>
                     <div *ngIf="checked">
                       Continue to Export Settings
                     </div>
                   <div>
-                    <button mat-button matStepperPrevious>Back</button>
+                    <button mat-button matSteppe Previous>Back</button>
                     <button mat-button matStepperNext>Next</button>
                   </div>
                 </form>
@@ -61,7 +61,7 @@
                     <ng-template matStepLabel>Fire Cannon</ng-template>
                     Begin cannon session.
                     <br/>
-                    <button mat-raised-button=""
+                    <button mat-raised-button
                     [disabled]="toggled"
                     (click)="fire()"
                     color="primary"

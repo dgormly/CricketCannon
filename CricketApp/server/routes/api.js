@@ -16,7 +16,7 @@ const connection = (closure) =>
     var db = client.db('cricket');
     closure(db);
   });
-}
+} 
 
 // Error handling
 const sendError = (err, res) => {

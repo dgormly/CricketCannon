@@ -19,8 +19,8 @@ export class FireComponent implements OnInit {
   checked = false;
   isLinear = true;
 
-  balls: string;
-  shots: string;
+  balls: number;
+  shots: number;
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
     this.fireService.isFiring(this.toggled);
@@ -48,7 +48,7 @@ export class FireComponent implements OnInit {
     console.log(this.balls);
     this.fireService.isFiring(this.toggled);
 
-    async.eachSeries([...Array(this.shots)].keys(), (key, next) => { 
+    async.eachSeries([...Array(this.shots * this.balls)].keys(), (key, next) => { 
       this.fireService.fireCannon().subscribe(() => {
         console.log(key);
         next()  
@@ -61,7 +61,6 @@ export class FireComponent implements OnInit {
       this.toggleOff();
     });
   } 
-
 
   saveToCsv(location: string): void {
     this.fireService.saveFile(location);
