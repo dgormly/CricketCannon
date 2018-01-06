@@ -23,7 +23,8 @@ export class FireComponent implements OnInit {
   balls: number = 0;
   shots: number = 0;
   currentShotNum = 0;
-  ballNames: string[] = ["hello", "World"];
+  ballNames: string[];
+  hasFired: boolean = false;
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
     this.fireService.isFiring(this.toggled);
@@ -85,6 +86,12 @@ export class FireComponent implements OnInit {
     })
   }
 
+  setBallNum(numBrands: number) {
+    console.log('number: ', this.ballNames);
+      this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball " + i);
+      console.log(this.ballNames);
+  }
+
     /**
      * Changes the step to the index specified
      * @param {number} index The index of the step
@@ -92,4 +99,8 @@ export class FireComponent implements OnInit {
     changeStep(index: number) {
       this.stepper.selectedIndex = index;
   }
+
+  trackByFn(index: any, item: any) {
+    return index;
+ }
 }
