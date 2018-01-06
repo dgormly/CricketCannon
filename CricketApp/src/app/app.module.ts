@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import {
   MatButtonModule, MatButtonToggleModule, MatExpansionModule, MatExpansionPanel, MatFormFieldModule, MatInputModule, MatTableModule,
-  MatToolbarModule, MatOptionModule, MatSelectModule, MatCheckboxModule, MatStepperModule
+  MatToolbarModule, MatOptionModule, MatSelectModule, MatCheckboxModule, MatStepperModule, MatProgressBarModule
 } from '@angular/material';
 import { AppRoutingModule } from './/app-routing.module';
 import { FireComponent } from './fire/fire.component';
@@ -47,6 +47,7 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations/src/m
     MatCheckboxModule,
     MatStepperModule,
     ReactiveFormsModule,
+    MatProgressBarModule
   ],
   providers: [FireService, DataService],
   bootstrap: [AppComponent]

@@ -19,8 +19,10 @@ export class FireComponent implements OnInit {
   checked = false;
   isLinear = true;
 
-  balls: number;
-  shots: number;
+  balls: number = 0;
+  shots: number = 0;
+  currentShotNum = 0;
+  currentBall: string[];
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
     this.fireService.isFiring(this.toggled);
@@ -48,13 +50,17 @@ export class FireComponent implements OnInit {
     console.log(this.balls);
     this.fireService.isFiring(this.toggled);
 
-    async.eachSeries([...Array(this.shots * this.balls)].keys(), (key, next) => { 
+    async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => { 
+      if (!this.toggled) return;
       this.fireService.fireCannon().subscribe(() => {
         console.log(key);
-        next()  
+        this.currentShotNum++;  
+        setTimeout(function() {
+          next();
+        },1000)
       })   /* <---- critical piece.  This is how the forEach knows to continue to
                            the next loop.  Must be called inside search's callback so that
-                           it doesn't loop prematurely.*/
+                           it   doesn't loop prematurely.*/
     }, (err) => {
       if (err) throw err;
       console.log('Session Finished');
@@ -70,4 +76,10 @@ export class FireComponent implements OnInit {
     this.toggled = false;
     this.fireService.isFiring(this.toggled);
   }
+
+  sleep(ms){
+    return new Promise(resolve=>{
+        setTimeout(resolve,ms)
+    })
+}
 }

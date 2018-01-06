@@ -2,12 +2,21 @@
 [expanded]="!toggled"
 (opened)= "toggleOff()"
  class="mat-elevation-z8" id="fire-form">
-      <mat-expansion-panel-header>
+      <mat-expansion-panel-header style="margin: 0 auto">
         <mat-panel-title>
-          Cannon Settings
+          Cannon Wizard
         </mat-panel-title>
         <mat-panel-description>
-          Cannon Wizard 
+        <div *ngIf="ballNames != null">
+          Current Ball: {{ currentBall }}
+          <mat-progress-bar
+          color="warn"
+          mode="determinate"
+          [value]="(currentShotNum / (balls * shots)) * 100"
+          class="progress">
+        </mat-progress-bar>
+          Shots Remaining: {{ (shots * balls - currentShotNum)}}
+      </div>
         </mat-panel-description>
       </mat-expansion-panel-header>       
             <mat-horizontal-stepper [linear]="isLinear">
@@ -51,7 +60,7 @@
                       Continue to Export Settings
                     </div>
                   <div>
-                    <button mat-button matSteppe Previous>Back</button>
+                    <button mat-button matSteppe matStepperPrevious>Back</button>
                     <button mat-button matStepperNext>Next</button>
                   </div>
                 </form>
@@ -77,6 +86,12 @@
             </button>
                     <div>
                       <button mat-button matStepperPrevious [disabled]="toggled">Back</button>
+                      <button mat-button
+                      (click)="currentShotNum = 0"
+                      color="warn"
+                      class="fire-form"  >
+                        Reset
+                      </button>
                       <button mat-button matStepperNext [disabled]="toggled">Next</button>
                     </div>
                   </form>

@@ -18,3 +18,8 @@ button {
 .button-spacer {
   flex: 1 1 auto;
 }
+
+.progress {
+  margin: auto;
+  width: 60%;
+}
