@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, Output} from '@angular/core';
+import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FireService} from '../fire.service';
 import {Response} from '../Response';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
@@ -13,16 +13,17 @@ import { nextTick } from 'async';
 })
 export class FireComponent implements OnInit {
 
+  @ViewChild('stepper') stepper;
+
   toggled = false;
   portNames: Response[] = [];
   selectedPort: string;
   checked = false;
-  isLinear = true;
 
   balls: number = 0;
   shots: number = 0;
   currentShotNum = 0;
-  currentBall: string[];
+  ballNames: string[] = ["hello", "World"];
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
     this.fireService.isFiring(this.toggled);
@@ -65,6 +66,7 @@ export class FireComponent implements OnInit {
       if (err) throw err;
       console.log('Session Finished');
       this.toggleOff();
+      this.changeStep(3);
     });
   } 
 
@@ -81,5 +83,13 @@ export class FireComponent implements OnInit {
     return new Promise(resolve=>{
         setTimeout(resolve,ms)
     })
-}
+  }
+
+    /**
+     * Changes the step to the index specified
+     * @param {number} index The index of the step
+     */
+    changeStep(index: number) {
+      this.stepper.selectedIndex = index;
+  }
 }

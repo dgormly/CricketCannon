@@ -2,13 +2,12 @@
 [expanded]="!toggled"
 (opened)= "toggleOff()"
  class="mat-elevation-z8" id="fire-form">
-      <mat-expansion-panel-header style="margin: 0 auto">
+      <mat-expansion-panel-header>
         <mat-panel-title>
           Cannon Wizard
         </mat-panel-title>
-        <mat-panel-description>
-        <div *ngIf="ballNames != null">
-          Current Ball: {{ currentBall }}
+        <mat-panel-description *ngIf="ballNames != null">
+          Current Ball: {{ ballNames[currentShotNum % ballNames.length] }}
           <mat-progress-bar
           color="warn"
           mode="determinate"
@@ -16,11 +15,10 @@
           class="progress">
         </mat-progress-bar>
           Shots Remaining: {{ (shots * balls - currentShotNum)}}
-      </div>
         </mat-panel-description>
       </mat-expansion-panel-header>       
-            <mat-horizontal-stepper [linear]="isLinear">
-              <mat-step>
+            <mat-horizontal-stepper linear="false" #stepper>
+              <mat-step [completed]="false">
                 <form>
                   <ng-template matStepLabel>Cannon Settings</ng-template>
 
@@ -38,22 +36,22 @@
                         Single Shot
                     </mat-checkbox>
                   <div>
-                    <button mat-button matStepperNext>Next</button>
+                    <button mat-button matStepperNext (click)="checked ? changeStep(2): null">Next</button>
                   </div>
                 </form>
               </mat-step>
-              <mat-step>
+              <mat-step [completed]="false">
                 <form>
                   <ng-template matStepLabel>Ball Settings</ng-template>
                     <div *ngIf="!checked" class="floating-box">
-                      <mat-form-field>
-                        <mat-label #numShots>Number of shots:</mat-label>
-                        <input matInput name="shots" [(ngModel)]="shots" type="number" [disabled]="toggled" placeholder="# Shots">
+                    <mat-form-field>
+                      <mat-label #numBall>Number of balls:</mat-label>
+                        <input matInput name="balls" [(ngModel)]="balls" type="number" [disabled]="toggled" placeholder="# Balls">
                       </mat-form-field>
                       <br/>
                       <mat-form-field>
-                        <mat-label #numBall>Number of balls:</mat-label>
-                        <input matInput name="balls" [(ngModel)]="balls" type="number" [disabled]="toggled" placeholder="# Balls">
+                        <mat-label #numShots>Number of shots:</mat-label>
+                        <input matInput name="shots" [(ngModel)]="shots" type="number" [disabled]="toggled" placeholder="# Shots">
                       </mat-form-field>
                     </div>
                     <div *ngIf="checked">
@@ -65,10 +63,16 @@
                   </div>
                 </form>
               </mat-step>
-              <mat-step>
+              <mat-step [completed]="false">
                   <form>
                     <ng-template matStepLabel>Fire Cannon</ng-template>
                     Begin cannon session.
+                    <div *ngIf="checked">
+                      <br/>
+                      <mat-form-field>
+                        <input matInput placeholder="Ball Name">
+                      </mat-form-field>
+                    </div>
                     <br/>
                     <button mat-raised-button
                     [disabled]="toggled"
@@ -77,26 +81,21 @@
                     class="fire-form"  >
               Start
             </button>
-            <button mat-raised-button
-                    [disabled]="!toggled"
-                    (click)="fire()"
-                    color="warn"
-                    class="fire-form"  >
-              Stop
-            </button>
-                    <div>
-                      <button mat-button matStepperPrevious [disabled]="toggled">Back</button>
-                      <button mat-button
-                      (click)="currentShotNum = 0"
-                      color="warn"
-                      class="fire-form"  >
-                        Reset
-                      </button>
-                      <button mat-button matStepperNext [disabled]="toggled">Next</button>
-                    </div>
-                  </form>
-                </mat-step>
-              <mat-step>
+            <span matTooltip="Resets the cannon progress to zero.">
+                <button mat-button
+                  (click)="currentShotNum = 0"
+                  color="warn"
+                 class="fire-form"  >
+                  Reset
+                </button>
+              </span>
+            <div>
+              <button mat-button matStepperPrevious [disabled]="toggled">Back</button>
+              <button mat-button matStepperNext [disabled]="toggled">Next</button>
+            </div>
+            </form>
+            </mat-step>
+              <mat-step [completed]="false">
                 <ng-template matStepLabel>Save file</ng-template>
                 Save data to a csv file.
               <br/>
@@ -116,15 +115,9 @@
         <mat-action-row>
           <button mat-button
                   (click)="clear()"
-                  color="primary" 
-                  class="fire-form"  >
-            Clear
-          </button>
-          <button mat-button
-                  (click)="fire()"
                   color="warn"
                   class="fire-form"  >
-            Reset
+            Clear
           </button>
         </mat-action-row> 
 </mat-expansion-panel>
