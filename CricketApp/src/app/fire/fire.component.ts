@@ -20,11 +20,14 @@ export class FireComponent implements OnInit {
   selectedPort: string;
   checked = false;
 
-  balls: number = 0;
-  shots: number = 0;
+  balls: number;
+  shots: number;
   currentShotNum = 0;
   ballNames: string[];
   hasFired: boolean = false;
+
+  firstFormGroup: FormGroup;
+  secondFormGroup: FormGroup;  
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
     this.fireService.isFiring(this.toggled);
@@ -33,6 +36,12 @@ export class FireComponent implements OnInit {
   ngOnInit() {
     this.fireService.getPorts().subscribe(val => {
       this.portNames = val.data
+    });
+    this.firstFormGroup = this._formBuilder.group({
+      firstCtrl: ['', Validators.required]
+    });
+    this.secondFormGroup = this._formBuilder.group({
+      secondCtrl: ['', Validators.required]
     });
   }
 
@@ -67,7 +76,7 @@ export class FireComponent implements OnInit {
       if (err) throw err;
       console.log('Session Finished');
       this.toggleOff();
-      this.changeStep(3);
+      this.changeStep(4);
     });
   } 
 
@@ -88,16 +97,16 @@ export class FireComponent implements OnInit {
 
   setBallNum(numBrands: number) {
     console.log('number: ', this.ballNames);
-      this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball " + i);
-      console.log(this.ballNames);
+    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball " + i);
+    console.log(this.ballNames);
   }
 
-    /**
-     * Changes the step to the index specified
-     * @param {number} index The index of the step
-     */
-    changeStep(index: number) {
-      this.stepper.selectedIndex = index;
+  /**
+   * Changes the step to the index specified
+   * @param {number} index The index of the step
+   */
+  changeStep(index: number) {
+    this.stepper.selectedIndex = index;
   }
 
   trackByFn(index: any, item: any) {

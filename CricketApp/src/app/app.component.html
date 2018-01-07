@@ -1,2 +1,10 @@
 <app-navigation></app-navigation>
-<router-outlet></router-outlet>
+<mat-tab-group>
+        <mat-tab label="Current">
+            <app-fire></app-fire>
+            <app-data></app-data>
+        </mat-tab>
+        <mat-tab label="All">
+            <app-data></app-data>
+        </mat-tab>
+      </mat-tab-group>

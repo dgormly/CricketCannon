@@ -17,13 +17,12 @@
           {{ (shots * balls - currentShotNum)}}
         </mat-panel-description>
       </mat-expansion-panel-header>       
-            <mat-horizontal-stepper linear="false" #stepper>
-              <mat-step [completed]="false">
-                <form>
+            <mat-horizontal-stepper linear="true" #stepper>
+              <mat-step [completed]="false" [stepControl]="firstFormGroup">
+                <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
-
                   <mat-form-field>
-                      <mat-select placeholder="Comm Port" [(value)]="selectedPort">
+                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" formControlName="firstCtrl" required>
                         <div *ngIf="portNames">
                           <mat-option *ngFor="let port of portNames" [value]="port.comName">
                             {{ port.comName }}
@@ -36,26 +35,23 @@
                         Single Shot
                     </mat-checkbox>
                   <div>
-                    <button mat-button matStepperNext (click)="checked ? changeStep(2): null">Next</button>
+                    <button mat-button matStepperNext (click)="checked ? changeStep(3): null">Next</button>
                   </div>
                 </form>
               </mat-step>
-              <mat-step [completed]="false">
-                <form>
+              <mat-step [completed]="false" [stepControl]="secondFormGroup">
+                <form [formGroup]="secondFormGroup">
                   <ng-template matStepLabel>Ball Settings</ng-template>
-                    <div *ngIf="!checked" class="floating-box">
+                    <div class="floating-box">
                     <mat-form-field>
                       <mat-label #numBall>Number of balls:</mat-label>
-                        <input matInput name="balls" [(ngModel)]="balls" type="number" [disabled]="toggled" placeholder="# Balls">
+                        <input matInput name="balls" [(ngModel)]="balls" type="number" placeholder="# Balls" formControlName="secondCtrl" required>
                       </mat-form-field>
                       <br/>
                       <mat-form-field>
                         <mat-label #numShots>Number of shots:</mat-label>
-                        <input matInput name="shots" [(ngModel)]="shots" type="number" [disabled]="toggled" placeholder="# Shots">
+                        <input matInput name="shots" [(ngModel)]="shots" type="number" placeholder="# Shots" formControlName="secondCtrl" required>
                       </mat-form-field>
-                    </div>
-                    <div *ngIf="checked">
-                      Continue to Cannon
                     </div>
                   <div>
                     <button mat-button matSteppe matStepperPrevious>Back</button>
@@ -70,7 +66,7 @@
                       <br/>
                       <div *ngIf="!checked" class="floating-box">
                         <div *ngFor="let ball of ballNames; let i = index trackBy:trackByFn">
-                        <mat-form-field>
+                        <mat-form-field >
                           <mat-label>Ball name</mat-label>
                           <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}">
                         </mat-form-field>
@@ -143,4 +139,3 @@
           </button>
         </mat-action-row> 
 </mat-expansion-panel>
-<app-data></app-data>
