@@ -17,6 +17,8 @@ export class FireService {
   private firingSubject = new BehaviorSubject<boolean>(false);
   firingMessage = this.firingSubject.asObservable();
   shotData = this.shots.asObservable();
+  private cShots = new BehaviorSubject<Shot[]>([]);
+  currentShots = this.cShots.asObservable();
 
   private httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json'})
@@ -66,14 +68,14 @@ export class FireService {
 
   clearShots(): void {
     console.log('Clearing shot data.');
-    this.shots.next([]);
+    this.cShots.next([]);
   }
 
 
   private addShot(ballName: string, shot: Shot): void {
     console.log('Shot added.');
     shot.name = ballName;
-    SHOTS.push(shot);
     this.shots.next(this.shots.getValue().concat(shot));
+    this.cShots.next(this.cShots.getValue().concat(shot));
   }
 }
