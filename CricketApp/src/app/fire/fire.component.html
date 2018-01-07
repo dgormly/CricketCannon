@@ -17,7 +17,7 @@
           {{ (shots * balls - currentShotNum)}}
         </mat-panel-description>
       </mat-expansion-panel-header>       
-            <mat-horizontal-stepper linear="true" #stepper>
+            <mat-horizontal-stepper [linear]="!checked" #stepper>
               <mat-step [completed]="false" [stepControl]="firstFormGroup">
                 <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
@@ -64,16 +64,13 @@
                     <ng-template matStepLabel>Shot list</ng-template>
                       Please fill out the ball names in shooting order.
                       <br/>
-                      <div *ngIf="!checked" class="floating-box">
+                      <div class="floating-box">
                         <div *ngFor="let ball of ballNames; let i = index trackBy:trackByFn">
                         <mat-form-field >
                           <mat-label>Ball name</mat-label>
                           <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}">
                         </mat-form-field>
                         </div>
-                      <div *ngIf="checked">
-                        Continue to Fire Cannon
-                      </div>
                     </div>
                     <div>
                       <button mat-button matSteppe matStepperPrevious>Back</button>
@@ -88,7 +85,7 @@
                     <div *ngIf="checked">
                       <br/>
                       <mat-form-field>
-                        <input matInput placeholder="Ball Name">
+                        <input matInput placeholder="Ball Name" name="singleShotName" [(ngModel)]="ballNames[0]">
                       </mat-form-field>
                     </div>
                     <br/>
@@ -108,7 +105,7 @@
                 </button>
               </span>
             <div>
-              <button mat-button matStepperPrevious [disabled]="toggled">Back</button>
+              <button mat-button matStepperPrevious [disabled]="toggled" (click)="checked ? changeStep(0) : null">Back</button>
               <button mat-button matStepperNext [disabled]="toggled">Next</button>
             </div>
             </form>

@@ -4,6 +4,8 @@ import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
 import {Shot} from '../Shot';
 import {FireService} from '../fire.service';
+import { MatTableDataSource } from '@angular/material';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'app-data',
@@ -13,29 +15,25 @@ import {FireService} from '../fire.service';
 
 export class DataComponent implements OnInit {
 
-  dataSource: ShotDataSource;
+  dataSource: MatTableDataSource<Shot>;
   displayedColumns = ['id', 'name'];
+  allData = false;
+
 
   constructor(private fireService: FireService) {
-    this.dataSource = new ShotDataSource(this.fireService);
-  }
+    this.dataSource = new MatTableDataSource();
+    this.fireService = fireService;
+    }
 
   ngOnInit() {
+    this.fireService.shotData.subscribe(data => {
+      this.dataSource.data = data;
+    });
   }
 
-}
-
-
-export class ShotDataSource extends DataSource<any> {
-
-  constructor(private fireService: FireService) {
-    super();
+  applyFilter(filterValue: string) {
+    filterValue = filterValue.trim(); // Remove whitespace
+    filterValue = filterValue.toLowerCase(); // MatTableDataSource defaults to lowercase matches
+    this.dataSource.filter = filterValue;
   }
-
-  connect(): Observable<Shot[]> {
-    return this.fireService.shotData;
-  }
-
-  disconnect(): void {}
-
 }

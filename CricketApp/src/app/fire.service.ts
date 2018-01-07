@@ -13,7 +13,7 @@ export class FireService {
 
   private serialPortUrl = '/api/ports';
   private ports: Response;
-  private shots = new BehaviorSubject<Shot[]>(SHOTS);
+  shots = new BehaviorSubject<Shot[]>(SHOTS);
   private firingSubject = new BehaviorSubject<boolean>(false);
   firingMessage = this.firingSubject.asObservable();
   shotData = this.shots.asObservable();
@@ -40,10 +40,10 @@ export class FireService {
     }, this.httpOptions).subscribe();
   }
 
-  fireCannon(): Observable<Shot> {
+  fireCannon(ballName: string): Observable<Shot> {
     return this.http.get<Shot>('/api/fire')
     .pipe(tap(data => {
-      this.addShot(data)
+      this.addShot(ballName, data)
     }));
   }
 
@@ -63,13 +63,17 @@ export class FireService {
     }, this.httpOptions).subscribe();
   }
 
+
   clearShots(): void {
     console.log('Clearing shot data.');
     this.shots.next([]);
   }
 
-  private addShot(shot: Shot): void {
+
+  private addShot(ballName: string, shot: Shot): void {
     console.log('Shot added.');
+    shot.name = ballName;
+    SHOTS.push(shot);
     this.shots.next(this.shots.getValue().concat(shot));
   }
 }

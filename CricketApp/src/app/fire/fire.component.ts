@@ -20,10 +20,10 @@ export class FireComponent implements OnInit {
   selectedPort: string;
   checked = false;
 
-  balls: number;
-  shots: number;
+  balls: number = 1;
+  shots: number = 1;
   currentShotNum = 0;
-  ballNames: string[];
+  ballNames: string[] = ["ball 0"];
   hasFired: boolean = false;
 
   firstFormGroup: FormGroup;
@@ -63,7 +63,7 @@ export class FireComponent implements OnInit {
 
     async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => { 
       if (!this.toggled) return;
-      this.fireService.fireCannon().subscribe(() => {
+      this.fireService.fireCannon(this.ballNames[key]).subscribe(() => {
         console.log(key);
         this.currentShotNum++;  
         setTimeout(function() {
