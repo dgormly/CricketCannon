@@ -1,10 +1,2 @@
 <app-navigation class="mat-elevation-z16"></app-navigation>
-<mat-tab-group class="mat-elevation-z12">
-        <mat-tab label="Current">
-            <app-fire class="mat-elevation-z8"></app-fire>
-            <app-data [allData]="false"></app-data>
-        </mat-tab>
-        <mat-tab label="All">
-            <app-data></app-data>
-        </mat-tab>
-      </mat-tab-group>
+<router-outlet></router-outlet>

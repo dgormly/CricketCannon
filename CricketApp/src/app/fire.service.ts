@@ -28,7 +28,8 @@ export class FireService {
 
   getPorts(): Observable<Response> {
     return this.http.get<Response>(this.serialPortUrl)
-      .pipe(tap(ports => {
+      .pipe(
+        tap(ports => {
         console.log(ports);
         this.ports = ports;
       }));

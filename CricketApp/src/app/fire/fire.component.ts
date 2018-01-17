@@ -34,9 +34,9 @@ export class FireComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fireService.getPorts().subscribe(val => {
-      this.portNames = val.data
-    });
+    // this.fireService.getPorts().subscribe(val => {
+    //   this.portNames = val.data
+    // });
     this.firstFormGroup = this._formBuilder.group({
       firstCtrl: ['', Validators.required]
     });
@@ -63,7 +63,7 @@ export class FireComponent implements OnInit {
 
     async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => { 
       if (!this.toggled) return;
-      this.fireService.fireCannon(this.ballNames[key]).subscribe(() => {
+      this.fireService.fireCannon(this.ballNames[key % this.ballNames.length]).subscribe(() => {
         console.log(key);
         this.currentShotNum++;  
         setTimeout(function() {
