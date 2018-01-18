@@ -35,7 +35,4 @@ void setup() {
 }
 
 void loop() {
-  analogWrite(3, 127);
-  // put your main code here, to run repeatedly:
-
 }
