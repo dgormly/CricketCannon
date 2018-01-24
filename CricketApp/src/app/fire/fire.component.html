@@ -22,7 +22,7 @@
                 <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
                   <mat-form-field>
-                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" formControlName="firstCtrl" required>
+                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="getPorts()" formControlName="firstCtrl" required>
                         <div *ngIf="portNames">
                           <mat-option *ngFor="let port of portNames" [value]="port.comName">
                             {{ port.comName }}

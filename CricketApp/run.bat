@@ -1,0 +1,2 @@
+SETCONSOLE /minimize
+npm start

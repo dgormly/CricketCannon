@@ -34,14 +34,17 @@ export class FireComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.fireService.getPorts().subscribe(val => {
-      this.portNames = val.data
-    });
     this.firstFormGroup = this._formBuilder.group({
       firstCtrl: ['', Validators.required]
     });
     this.secondFormGroup = this._formBuilder.group({
       secondCtrl: ['', Validators.required]
+    });
+  }
+
+  getPorts() {
+    this.fireService.getPorts().subscribe(val => {
+      return this.portNames = val.data
     });
   }
 
@@ -68,7 +71,7 @@ export class FireComponent implements OnInit {
         this.currentShotNum++;
         setTimeout(function() {
           next();
-        },1000)
+        }, 1000)
       })   /* <---- critical piece.  This is how the forEach knows to continue to
                            the next loop.  Must be called inside search's callback so that
                            it   doesn't loop prematurely.*/
