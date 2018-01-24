@@ -1,10 +1,12 @@
 {
   "name": "cricket-app",
+  "productName": "Cricket Cannon",
+  "description": "Weapon of choice",
   "version": "0.0.0",
   "license": "MIT",
   "main": "main.js",
   "scripts": {
-    "start": "ng serve"
+    "start": "node start.js && node server"
   },
   "engines": {
     "node": "~6.10.3",
@@ -34,6 +36,7 @@
     "json2csv": "^3.11.5",
     "jsonwebtoken": "^8.1.0",
     "mongodb": "^3.0.1",
+    "open": "0.0.5",
     "rxjs": "^5.5.2",
     "serialport": "^6.0.4",
     "web-animations-js": "^2.3.1",
@@ -45,7 +48,8 @@
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "~6.0.60",
     "codelyzer": "^4.0.1",
-    "electron-rebuild": "^1.6.0",
+    "electron-packager": "^10.1.1",
+    "electron-winstaller": "^2.6.4",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",
     "karma": "~1.7.0",

@@ -3,11 +3,11 @@
   <h1>Login</h1>
 </mat-card-header>
 <mat-form-field>
-  <input matInput placeholder="Username">
+  <input #username matInput placeholder="Username">
 </mat-form-field>
 
 <mat-form-field>
-  <input matInput type="password" placeholder="Password">
+  <input #password matInput type="password" placeholder="Password">
 </mat-form-field>
-<button mat-button color="primary" (click)="login()">Login</button>
+<button mat-button color="primary" (click)="login(username, password)">Login</button>
 </mat-card>
