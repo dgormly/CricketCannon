@@ -27,16 +27,16 @@ export class FireComponent implements OnInit {
   hasFired: boolean = false;
 
   firstFormGroup: FormGroup;
-  secondFormGroup: FormGroup;  
+  secondFormGroup: FormGroup;
 
-  constructor(private fireService: FireService, private _formBuilder: FormBuilder) { 
+  constructor(private fireService: FireService, private _formBuilder: FormBuilder) {
     this.fireService.isFiring(this.toggled);
   }
 
   ngOnInit() {
-    // this.fireService.getPorts().subscribe(val => {
-    //   this.portNames = val.data
-    // });
+    this.fireService.getPorts().subscribe(val => {
+      this.portNames = val.data
+    });
     this.firstFormGroup = this._formBuilder.group({
       firstCtrl: ['', Validators.required]
     });
@@ -61,11 +61,11 @@ export class FireComponent implements OnInit {
     console.log(this.balls);
     this.fireService.isFiring(this.toggled);
 
-    async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => { 
+    async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
       if (!this.toggled) return;
       this.fireService.fireCannon(this.ballNames[key % this.ballNames.length]).subscribe(() => {
         console.log(key);
-        this.currentShotNum++;  
+        this.currentShotNum++;
         setTimeout(function() {
           next();
         },1000)
@@ -78,7 +78,7 @@ export class FireComponent implements OnInit {
       this.toggleOff();
       this.changeStep(4);
     });
-  } 
+  }
 
   saveToCsv(location: string): void {
     this.fireService.saveFile(location);
