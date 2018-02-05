@@ -7,6 +7,8 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {tap} from 'rxjs/operators';
 import {SHOTS} from './mock-shots';
 import { Subject } from 'rxjs/Subject';
+import * as socketIo from 'socket.io-client';
+
 
 @Injectable()
 export class FireService {
@@ -19,12 +21,23 @@ export class FireService {
   shotData = this.shots.asObservable();
   private cShots = new BehaviorSubject<Shot[]>([]);
   currentShots = this.cShots.asObservable();
+  private socket;
+  currentPressure = -1.0;
 
   private httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json'})
   };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+  }
+
+  connectSocket(): void {
+    this.socket = socketIo('http://localhost:5000');
+    this.socket.on('pressure', (data) => {
+      console.log(data);
+      this.currentPressure = data;
+    });
+  }
 
   getPorts(): Observable<Response> {
     return this.http.get<Response>(this.serialPortUrl)
@@ -43,10 +56,14 @@ export class FireService {
     }, this.httpOptions).subscribe();
   }
 
-  fireCannon(ballName: string): Observable<Shot> {
-    return this.http.get<Shot>('/api/fire')
+  fireCannon(pressureValue: number, ballName: string): Observable<Object> {
+    return this.http.post<Shot>('/api/fire',
+    {
+       pressure: pressureValue
+    }, this.httpOptions)
     .pipe(tap(data => {
-      this.addShot(ballName, data)
+      console.log(data);
+
     }));
   }
 
@@ -55,7 +72,7 @@ export class FireService {
   }
 
   saveFile(filePath: string): void {
-    this.http.post<object>('/api/export', 
+    this.http.post<object>('/api/export',
     {
       "data": [{
         "id": "hello",
@@ -79,4 +96,6 @@ export class FireService {
     this.shots.next(this.shots.getValue().concat(shot));
     this.cShots.next(this.cShots.getValue().concat(shot));
   }
+
+
 }

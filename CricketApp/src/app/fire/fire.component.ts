@@ -23,6 +23,7 @@ export class FireComponent implements OnInit {
   balls: number = 1;
   shots: number = 1;
   currentShotNum = 0;
+  pressure = 0;
   ballNames: string[] = ["ball 0"];
   hasFired: boolean = false;
 
@@ -40,6 +41,8 @@ export class FireComponent implements OnInit {
     this.secondFormGroup = this._formBuilder.group({
       secondCtrl: ['', Validators.required]
     });
+
+    this.fireService.connectSocket();
   }
 
   getPorts() {
@@ -49,7 +52,7 @@ export class FireComponent implements OnInit {
   }
 
   updateSettings(): void {
-    console.log('button pressed');
+    console.log('Port updated');
     this.fireService.postSettings(this.selectedPort);
   }
 
@@ -57,7 +60,7 @@ export class FireComponent implements OnInit {
     this.fireService.clearShots();
   }
 
-  fire(): void {
+  fire(pressure: number): void {
     var count = 0;
     this.toggled = !this.toggled;
     console.log('Firing!');
@@ -66,7 +69,7 @@ export class FireComponent implements OnInit {
 
     async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
       if (!this.toggled) return;
-      this.fireService.fireCannon(this.ballNames[key % this.ballNames.length]).subscribe(() => {
+      this.fireService.fireCannon( this.pressure, this.ballNames[key % this.ballNames.length]).subscribe(() => {
         console.log(key);
         this.currentShotNum++;
         setTimeout(function() {
