@@ -7,8 +7,10 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const json2csv = require('json2csv');
 const fs = require('fs');
+const io = serverFile.io;
 
 var port;
+var saveDir = "./data/shots";
 
 // Connect
 const connection = (closure) =>
@@ -62,17 +64,23 @@ router.get('/ports', (req, res) => {
 
 // Set cannon settings.
 router.post('/settings', (req, res) => {
-  res.send("OK");
+  res.send({
+    status: "OK"}
+  );
   console.log('Post received');
   console.log(req.body.port);
   port = new SerialPort(req.body.port, {
     baudRate: 9600
   });
 
-  port.on('data', data => {
+  port.on('data', function(data) {
     console.log("Data received.");
-    serverFile.client.emit('Test', {
-      message: "It's working!"
+    var message = data.toString();
+    console.log(message);
+    var arr = message.split("/");
+    console.log(arr[0]);
+    serverFile.client.emit(arr[0], {
+       value: arr[1]
     });
   });
 });
@@ -91,7 +99,9 @@ router.post('/fire', (req, res) => {
       res.send("ERROR");
       return console.log("Error occured writing to port, check if the comport is open.");
     }
-    res.send("OK")
+    res.send({
+      status: "OK"
+    });
   });
 });
 
@@ -111,7 +121,7 @@ router.post('/export', (req, res) => {
     console.log('file saved.');
   });
   res.send({
-    'status':'ok'
+    status: 'OK'
   });
 });
 

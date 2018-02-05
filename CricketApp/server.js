@@ -38,7 +38,7 @@ server.listen(port, () => {
 
 
 console.log("Setting up sockets.");
-const io = socketIo(server);
+const io = module.exports.io = socketIo(server);
 io.on('connection', (socket) => {
   console.log('The client connected');
   module.exports.client = socket;

@@ -22,7 +22,7 @@ export class FireService {
   private cShots = new BehaviorSubject<Shot[]>([]);
   currentShots = this.cShots.asObservable();
   private socket;
-  currentPressure = -1.0;
+  currentPressure;
 
   private httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json'})
@@ -33,9 +33,10 @@ export class FireService {
 
   connectSocket(): void {
     this.socket = socketIo('http://localhost:5000');
-    this.socket.on('pressure', (data) => {
-      console.log(data);
-      this.currentPressure = data;
+    this.socket.on('RESULT', function(data) {
+      console.log("Client rec data:");
+      console.log(data.toString());
+      //this.currentPressure = data;
     });
   }
 
