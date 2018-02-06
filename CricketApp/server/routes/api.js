@@ -78,10 +78,14 @@ router.post('/settings', (req, res) => {
     var message = data.toString();
     console.log(message);
     var arr = message.split("/");
+    if (arr[0] == "3pt") {
+      serverFile.scale.emit("DATA", "Hello World");
+    } else {
     console.log(arr[0]);
     serverFile.client.emit(arr[0], {
        value: arr[1]
     });
+  }
   });
 });
 
@@ -124,6 +128,5 @@ router.post('/export', (req, res) => {
     status: 'OK'
   });
 });
-
 
 module.exports = router;
