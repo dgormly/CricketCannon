@@ -15,9 +15,9 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export class DataComponent implements OnInit {
 
-  dataSource: MatTableDataSource<Shot>;
+  dataSource: MatTableDataSource<any>;
   displayedColumns = ['id', 'name'];
-  @Input() allData = true;
+  @Input() allData = "ALL";
 
 
   constructor(private fireService: FireService) {
@@ -26,9 +26,14 @@ export class DataComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.allData) {
+    if (this.allData == "ALL") {
       this.fireService.shotData.subscribe(data => {
         this.dataSource.data = data;
+      });
+    } else if (this.allData == "SCALE") {
+      this.fireService.scaleData.subscribe(data => {
+        this.dataSource.data = data;
+        this.displayedColumns = ["rw1", "rw2", "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
       });
     } else {  
       this.fireService.currentShots.subscribe(data => {

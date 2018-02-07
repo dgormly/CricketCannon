@@ -34,7 +34,7 @@ long delayThreshold = 50; // millisecond delay between samplings.
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Wait...");
+  //Serial.println("Wait...");
   // read EEPROM values
   int addrOffset = 0;                       // starting address for calibration data storage
   CalibrationData storedCal;    // variable to store custom sensor calibration data from EEPROM.
@@ -57,7 +57,7 @@ void setup() {
   LoadCell_1.setCalFactor(storedCal.sensor1); 
   LoadCell_2.setCalFactor(storedCal.sensor2); 
   LoadCell_3.setCalFactor(storedCal.sensor3); 
-  Serial.println("SETUP/OK");
+  Serial.println("SETUP!OK");
 }
 
 void loop() {  
@@ -97,43 +97,15 @@ void loop() {
 
     //Serial.print("n:,");
     //Serial.print(countSum);
-    Serial.print("Raw:" +  String(a) + "," + String(b) + "," + String(c) + "\r\n");
-    Serial.print("Sum:" + String(sum));
-    Serial.print("W1:" + String(w1x) + "," + String(w1y) + "/W2:" +String(w2x) + "," + String(w2y) + "/W3:" + String(w3x) + "," + String(w3y) + "\r\n");
-    Serial.print("dx:" + String(deltaX) + "/dy:" + String(deltaY) + "\r\n");
-    Serial.print("distX:" + String(distX) + "/distY:" + String(distY) + "\r\n");
-    Serial.flush();
-//    Serial.print("Raw:");  
-//    Serial.print(a);
-//    Serial.print(",");
-//    Serial.print(b);
-//    Serial.print(",");
-//    Serial.print(c);    
-//    Serial.print("/Sum:");
-//    Serial.print(sum);
-//    Serial.print("/W1:");
-//    Serial.print(w1x);
-//    Serial.print(",");
-//    Serial.print(w1y);
-//    Serial.print("/W2:");
-//    Serial.print(w2x);
-//    Serial.print(",");
-//    Serial.print(w2y);
-//    Serial.print("/W3:");
-//    Serial.print(w3x);
-//    Serial.print(",");
-//    Serial.print(w3y);
-//    Serial.print("/dx:");
-//    Serial.print(deltaX);
-//    Serial.print("/dy:");
-//    Serial.print(deltaY);
-//    Serial.print("/distX:");
-//    Serial.print(distX);
-//    Serial.print("/distY:");
-//    Serial.print(distY);
-//    
-//    Serial.print("\n");
-    delay(500); 
+    Serial.print("SCALE!Raw/" +  String(a) + "/" + String(b) + "/" + String(c) 
+                + "/Sum/" + String(sum) 
+                + "/W1/" + String(w1x) + "/" + String(w1y) 
+                + "/W2/" +String(w2x) + "/" + String(w2y) 
+                + "/W3/" + String(w3x) + "/" + String(w3y)
+               + "/dx/" + String(deltaX) + "/dy/" + String(deltaY)
+               +"/distX/" + String(distX) + "/distY/" + String(distY)
+               + "\n");
+    delay(250); 
   }
 
   //receive from serial terminal
@@ -147,15 +119,15 @@ void loop() {
       while (LoadCell_1.getTareStatus()){
         delay(100);        
       }
-      Serial.println("Tare load cell 1 complete");
+     // Serial.println("Tare load cell 1 complete");
       while (LoadCell_2.getTareStatus()){
         delay(100);        
       }
-      Serial.println("Tare load cell 2 complete");
+     // Serial.println("Tare load cell 2 complete");
       while (LoadCell_3.getTareStatus()){
         delay(100);        
       }
-      Serial.println("Tare load cell 3 complete");
+      Serial.println("TARE!OK");
     }
   }
 }

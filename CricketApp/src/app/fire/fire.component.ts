@@ -42,6 +42,8 @@ export class FireComponent implements OnInit {
       secondCtrl: ['', Validators.required]
     });
 
+    this.getPorts();
+
     this.fireService.connectSocket();
   }
 
