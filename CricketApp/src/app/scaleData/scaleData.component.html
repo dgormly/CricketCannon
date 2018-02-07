@@ -1,0 +1,88 @@
+<div class="table-container">
+  <div class="filter">
+    <mat-form-field>
+      <input matInput placeholder="Filter" (keyup)="applyFilter($event.target.value)">
+    </mat-form-field>
+  </div>
+  <mat-table #table [dataSource]="dataSource">
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+    <!-- Id Column -->
+    <ng-container matColumnDef="rw1">
+      <mat-header-cell *matHeaderCellDef> rw1 </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw1}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="rw2">
+      <mat-header-cell *matHeaderCellDef> rw2 </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw2}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="rw3">
+      <mat-header-cell *matHeaderCellDef> rw3 </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw3}} </mat-cell>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="sum">
+      <mat-header-cell *matHeaderCellDef> Sum </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.sum}} </mat-cell>
+    </ng-container>
+
+
+    <ng-container matColumnDef="w1x">
+      <mat-header-cell *matHeaderCellDef> w1x </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w1x}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="w1y">
+      <mat-header-cell *matHeaderCellDef> w1y </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w1y}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="w2x">
+      <mat-header-cell *matHeaderCellDef> w2x </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w2x}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="w2y">
+      <mat-header-cell *matHeaderCellDef> w2y </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w2y}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="w3x">
+      <mat-header-cell *matHeaderCellDef> w3x </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w3x}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="w3y">
+      <mat-header-cell *matHeaderCellDef> w3y </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.w3y}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="deltaX">
+      <mat-header-cell *matHeaderCellDef> deltaX </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.deltaX}} </mat-cell>
+    </ng-container>
+    <ng-container matColumnDef="deltaY">
+      <mat-header-cell *matHeaderCellDef> deltaY </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.deltaY}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="distX">
+      <mat-header-cell *matHeaderCellDef> distX </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.distX}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="distY">
+      <mat-header-cell *matHeaderCellDef> distY </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.distY}} </mat-cell>
+    </ng-container>
+
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>

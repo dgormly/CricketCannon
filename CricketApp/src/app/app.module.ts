@@ -11,6 +11,7 @@ import {
 import { AppRoutingModule } from './/app-routing.module';
 import { FireComponent } from './fire/fire.component';
 import { DataComponent } from './data/data.component';
+import { ScaleDataComponent } from './scaleData/scaleData.component';
 import { ScaleComponent } from './scale/scale.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FireService} from './fire.service';
@@ -33,7 +34,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     DataComponent,
     ScaleComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    ScaleDataComponent
   ],
   imports: [
     FormsModule,

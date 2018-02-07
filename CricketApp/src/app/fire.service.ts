@@ -99,7 +99,6 @@ export class FireService {
     }, this.httpOptions)
     .pipe(tap(data => {
       console.log(data);
-
     }));
   }
 
@@ -139,7 +138,7 @@ export class FireService {
   }
 
   clearScale(): void {
-    this.cScale.next(this.cScale.getValue().concat([]));
+    this.cScale.next([]);
   }
 
 

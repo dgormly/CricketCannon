@@ -2,22 +2,21 @@ import { Component, OnInit, Input } from '@angular/core';
 import {DataService} from '../data.service';
 import {DataSource} from '@angular/cdk/collections';
 import {Observable} from 'rxjs/Observable';
-import {Shot} from '../Shot';
+import {Shot, Scale} from '../Shot';
 import {FireService} from '../fire.service';
 import { MatTableDataSource } from '@angular/material';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
-  selector: 'app-data',
-  templateUrl: './data.component.html',
-  styleUrls: ['./data.component.css']
+  selector: 'app-ScaleData',
+  templateUrl: './ScaleData.component.html',
+  styleUrls: ['./ScaleData.component.css']
 })
 
-export class DataComponent implements OnInit {
+export class ScaleDataComponent implements OnInit {
 
-  dataSource: MatTableDataSource<any>;
-  displayedColumns = ['id', 'name'];
-  @Input() allData = true;
+  dataSource: MatTableDataSource<Scale>;
+  displayedColumns = ['rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
 
 
   constructor(private fireService: FireService) {
@@ -26,15 +25,9 @@ export class DataComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.allData == true) {
-      this.fireService.shotData.subscribe(data => {
+      this.fireService.scaleData.subscribe(data => {
         this.dataSource.data = data;
       });
-    } else {  
-      this.fireService.currentShots.subscribe(data => {
-        this.dataSource.data = data;
-      });
-    }
   }
 
   applyFilter(filterValue: string) {

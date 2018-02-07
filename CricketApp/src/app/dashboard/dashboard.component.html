@@ -1,13 +1,13 @@
 <mat-tab-group class="mat-elevation-z12">
   <mat-tab label="Current">
       <app-fire class="mat-elevation-z8"></app-fire>
-      <app-data [allData]="ALL"></app-data>
+      <app-data allData="true"></app-data>
   </mat-tab>
   <mat-tab label="All">
       <app-data></app-data>
   </mat-tab>
   <mat-tab label="Scale">
       <app-scale></app-scale>
-      <app-data [allData]="SCALE"></app-data>
+      <app-ScaleData></app-ScaleData>
   </mat-tab>
 </mat-tab-group>
