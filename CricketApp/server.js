@@ -8,6 +8,8 @@ const Readline = SerialPort.parsers.Readline;
 // API file for interacting with MongoDB
 const api = require('./server/routes/api');
 const socketIo = require('socket.io');
+const json2csv = require('json2csv');
+const fs = require('fs');
 
 var scalePort;
 
@@ -74,6 +76,23 @@ io.on('connection', (socket) => {
   socket.on('TARE', function(data) {
     scalePort.write('t');
   });
+
+  socket.on('SAVESCALE', function(scaleData) {
+    console.log('Printing CSV:');
+  
+    var csvString = json2csv(
+      {
+        data: scaleData.data,
+        fields: scaleData.headers
+    });
+    csvString = csvString.replace('[','');
+    
+    csvString = csvString.replace(']','');
+    fs.writeFile("./../data/Scale/" + scaleData.name + ".csv", csvString, function(err) {
+      if (err) throw err;
+      console.log('file saved.');
+    });
+  })
 
   socket.on('disconnect', function(){
     console.log('user disconnected');

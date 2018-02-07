@@ -19,7 +19,8 @@
               </mat-select>
             </mat-form-field>
           </div>
-        <div *ngIf="showData">
+        <div>
+          Sample Count: {{ count }} <br />
           Raw: A:{{ rw1[count-1] }} B:{{ rw2[count-1]  }} C:{{ rw3[count-1]  }} <br />
           Sum: {{ sum[count-1]  }} <br />
           W1: X: {{ w1x[count-1]  }} Y: {{ w1y[count-1]  }} <br />
@@ -42,10 +43,13 @@
       (click)="displaySample()">
         Sample
     </button>
-      <button mat-button
-              color="secondary"
-              [disabled]="!hasTared"
-              (click)="tare()">
+    <mat-form-field>
+        <mat-label>File Name</mat-label>
+        <input matInput name="fileNameInput" [(ngModel)]="fileName" placeholder="File name">
+      </mat-form-field>
+      <button mat-raised-button
+              color="accent"
+              (click)="saveScaleData()">
         Export
       </button>
     </mat-card-actions>

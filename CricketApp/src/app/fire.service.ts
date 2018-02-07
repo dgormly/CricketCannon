@@ -137,8 +137,16 @@ export class FireService {
     this.cScale.next(this.cScale.getValue().concat(scale));
   }
 
-  clearScale(): void {
+  clearScaleData(): void {
     this.cScale.next([]);
+  }
+
+  saveScaleData(): void {
+    this.socket.emit('SAVESCALE', {
+      name: "test",
+      headers:  ['rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"],
+      data: this.cScale.getValue()
+    });
   }
 
 
