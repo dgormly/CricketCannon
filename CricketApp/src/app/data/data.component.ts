@@ -15,7 +15,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 export class DataComponent implements OnInit {
 
-  dataSource: MatTableDataSource<Shot>;
+  dataSource: MatTableDataSource<any>;
   displayedColumns = ['id', 'name'];
   @Input() allData = true;
 
@@ -26,7 +26,7 @@ export class DataComponent implements OnInit {
   }
 
   ngOnInit() {
-    if (this.allData) {
+    if (this.allData == true) {
       this.fireService.shotData.subscribe(data => {
         this.dataSource.data = data;
       });

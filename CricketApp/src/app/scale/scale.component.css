@@ -1,0 +1,26 @@
+#card-form {
+    margin: 16px;
+    text-align: center;
+  
+  }
+  
+  button {
+    margin: 16px;
+    width: 70px;
+  }
+  
+  .floating-box {
+    display: inline-block;
+    width:fit-content;
+    margin: 16px;
+  }
+  
+  .button-spacer {
+    flex: 1 1 auto;
+  }
+  
+  .progress {
+    margin: auto;
+    width: 60%;
+  }
+  

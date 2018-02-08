@@ -1,4 +1,4 @@
-<mat-expansion-panel 
+<mat-expansion-panel
 [expanded]="!toggled"
 (opened)= "toggleOff()"
            id="fire-form">
@@ -16,13 +16,13 @@
         </mat-progress-bar>
           {{ (shots * balls - currentShotNum)}}
         </mat-panel-description>
-      </mat-expansion-panel-header>       
+      </mat-expansion-panel-header>
             <mat-horizontal-stepper [linear]="!checked" #stepper>
               <mat-step [completed]="false" [stepControl]="firstFormGroup">
                 <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
                   <mat-form-field>
-                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" formControlName="firstCtrl" required>
+                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="getPorts()" (change)="updateSettings()" formControlName="firstCtrl" required>
                         <div *ngIf="portNames">
                           <mat-option *ngFor="let port of portNames" [value]="port.comName">
                             {{ port.comName }}
@@ -34,6 +34,11 @@
                     <mat-checkbox [(ngModel)]="checked" [ngModelOptions]="{standalone: true}">
                         Single Shot
                     </mat-checkbox>
+                    <br />
+                    <mat-form-field>
+                      <mat-label #pressureNum>Pressure: </mat-label>
+                      <input matInput name="pressureInput" [(ngModel)]="pressure" placeholder="pressure" type="number" formControlName="firstCtrl" required>
+                    </mat-form-field>
                   <div>
                     <button mat-button matStepperNext (click)="checked ? changeStep(3): null">Next</button>
                   </div>
@@ -118,7 +123,7 @@
                   <mat-label>File name</mat-label>
                   <input matInput #fileLocation placeholder="File name">
                 </mat-form-field>
-                <button mat-button 
+                <button mat-button
                 (click)="saveToCsv(fileLocation.value)"
               color="primary">Save
             </button>
@@ -134,5 +139,5 @@
                   class="fire-form"  >
             Clear
           </button>
-        </mat-action-row> 
+        </mat-action-row>
 </mat-expansion-panel>

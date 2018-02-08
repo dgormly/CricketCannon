@@ -11,7 +11,8 @@ import {
 import { AppRoutingModule } from './/app-routing.module';
 import { FireComponent } from './fire/fire.component';
 import { DataComponent } from './data/data.component';
-import { DataNavComponent } from './data-nav/data-nav.component';
+import { ScaleDataComponent } from './scaleData/scaleData.component';
+import { ScaleComponent } from './scale/scale.component';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {FireService} from './fire.service';
 import {HttpClientModule} from '@angular/common/http';
@@ -22,6 +23,7 @@ import { AuthGuard } from './auth-guard.service';
 import { AuthService } from './auth.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+//import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -30,9 +32,10 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     NavigationComponent,
     FireComponent,
     DataComponent,
-    DataNavComponent,
+    ScaleComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    ScaleDataComponent
   ],
   imports: [
     FormsModule,
@@ -56,7 +59,8 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     MatProgressBarModule,
     MatTooltipModule,
     MatTabsModule,
-    MatCardModule
+    MatCardModule,
+    //NgbModule
   ],
   providers: [AuthService, AuthGuard, FireService, DataService],
   bootstrap: [AppComponent]

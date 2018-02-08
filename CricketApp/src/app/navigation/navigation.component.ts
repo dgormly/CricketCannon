@@ -10,6 +10,7 @@ export class NavigationComponent implements OnInit {
 
   title = 'Cricket Cannon';
   toggled: boolean;
+  pressureValue;
 
   constructor(private fireService: FireService) {
       fireService.firingMessage.subscribe(toggled => {
@@ -19,6 +20,7 @@ export class NavigationComponent implements OnInit {
    }
 
   ngOnInit() {
+    this.pressureValue = this.fireService.currentPressure;
   }
 
 }

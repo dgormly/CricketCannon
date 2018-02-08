@@ -9,7 +9,7 @@ void setup() {
 }
 
 void loop() {
-  float val = sin(phase) * 2000.0 * 0.4/3.3 + 2050.0 * 0.4/3.3;
+  float val = sin(phase) * 2000.0 + 2050.0;
   analogWrite(A14, (int)val);
   phase = phase + 0.02;
   if (phase >= twopi) phase = 0;
