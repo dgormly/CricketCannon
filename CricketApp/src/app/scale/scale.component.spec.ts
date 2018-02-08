@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DataNavComponent } from './data-nav.component';
+import { ScaleComponent } from './Scale.component';
 
-describe('DataNavComponent', () => {
-  let component: DataNavComponent;
-  let fixture: ComponentFixture<DataNavComponent>;
+describe('ScaleComponent', () => {
+  let component: ScaleComponent;
+  let fixture: ComponentFixture<ScaleComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ DataNavComponent ]
+      declarations: [ ScaleComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(DataNavComponent);
+    fixture = TestBed.createComponent(ScaleComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
