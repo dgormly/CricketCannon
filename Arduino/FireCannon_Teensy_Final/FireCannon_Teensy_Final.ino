@@ -59,6 +59,7 @@ volatile int timesincepressureread = 0;
 void setup()
 {
   //Relay Board Stuff
+  analogWrite(A14, 1);
   setup_relays();
   pinMode(13, OUTPUT); 
   servo.attach(SERVO);
@@ -197,27 +198,31 @@ void handleContact() {
         fire(line.toFloat());
             
       } else if (line == "AUTO") {
-        for(int i = 0; i < 10; i++) {
+        for(int i = 0; i < 20; i++) {
           fire(100);
-          delay(10000);
+          //delay(1000);
         }
       } else if(line == "TEST") {
         testpropreg();
       }
-
+    
+    } else if(line == "stop") {
+      depressurise();
     }
   }
 }
+float globalpsi = 0;
 
 void testpropreg() {
   line = Serial.readStringUntil('\n');
   float psi = line.toFloat();
+  globalpsi = psi;
   float bar = psi/ 14.5038;
   long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
   Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
   int reg_val;
-  for(int i = 0; i < 50; i++) {
+  for(int i = 0; i < 10; i++) {
     reg_val = analogRead(PROP_FEEDBACK);
     Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
     delay(100);
@@ -274,15 +279,20 @@ void GetPressure() {
 
 void fire(float psi) {
   //Fire Cannon Function: Solenoid Sequence to Trigger QEV
+  reload();
   Pressurise(psi);
   digitalWrite(TRIGGER_NO, HIGH);
+  Serial.println("CAMERA BEFORE");
   digitalWrite(CAMERA, HIGH);
+  delay(50);
+  digitalWrite(CAMERA, LOW);
+  Serial.println("CAMEA AFTER");
   delay(VALVE_DELAY);
   digitalWrite(TRIGGER_NC, HIGH);
   delay(DUMP_DELAY);
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
-  digitalWrite(CAMERA, LOW);
+  Serial.println("FIRE");
   Pressurise(25);
 }
 
@@ -296,14 +306,33 @@ void reload() {
 
 #define REGTHRESHOLD 300
 
+void depressurise() {
+  float bar;
+  long valtodac;
+  int reg_val;
+  for(int i = globalpsi; i > 21.8; i--) { 
+    bar = globalpsi / 14.5038;
+    valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+    analogWrite(A14, valtodac);
+    delay(200);
+    reg_val = analogRead(PROP_FEEDBACK);
+    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+  }
+}
+
 void Pressurise(float psi){
   float bar = psi / 14.5038;
+  globalpsi = psi;
   long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
   Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
   bool atpressure = false;
   int reg_val;
-  delay(10000); //THIS CAN BE REMOVED ONCE WE HAVE FIGURED OUT WHY THE PRESSURE REG JUMPS AROUND SO MUCH
+  for(int i = 0; i < 10; i++) {
+    reg_val = analogRead(PROP_FEEDBACK);
+    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+    delay(100);
+  }
   /*
   while(!atpressure){
     reg_val = analogRead(PROP_FEEDBACK);  
@@ -317,20 +346,5 @@ void Pressurise(float psi){
     }
   }
   */
-}
-
-void debug() {
-  Serial.println("Running tests");
-  // Fire all relays
-  for (int i = 3; i > -1; i--) {
-    digitalWrite(i, HIGH);
-    delay(2000);
-    digitalWrite(i, LOW);
-  }
-
-  // Rotate servo from 0 - 90 - 0
-  servo.write(10);
-  delay(2000);
-  servo.write(100);
 }
 
