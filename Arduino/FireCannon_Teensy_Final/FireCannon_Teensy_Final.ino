@@ -16,14 +16,15 @@ const int TANK_DELAY = 1000;
 String message = "";
 
 //Relay Board Stuff///////////////////////////////////
-const int TRIGGER_NO = 1;     //Relay 2
-const int TRIGGER_NC = 2;     //Relay 3
-const int TANK_NO = 0;        //Relay 1
-const int REG_NC = 5;         //N/A
-const int CYLINDER_NO = 6;    //N/A
-const int DUMP_NO = 3;        //Relay 4
-const int CLICKER = 4;
-const int SERVO = 20;         // A6
+#define TRIGGER_NO 1   //Relay 2
+#define TRIGGER_NC 2    //Relay 3
+#define TANK_NO 0      //Relay 1
+#define REG_NC 5        //N/A
+#define CYLINDER_NO 6    //N/A
+#define DUMP_NO 3        //Relay 4
+#define CLICKER 4
+#define SERVO 20         // A6
+#define CAMERA A9
 ////////////////////////////////////////////////////
 
 //Laser detection variables///////////////////
@@ -58,6 +59,7 @@ volatile int timesincepressureread = 0;
 void setup()
 {
   //Relay Board Stuff
+  analogWrite(A14, 1);
   setup_relays();
   pinMode(13, OUTPUT); 
   servo.attach(SERVO);
@@ -66,6 +68,7 @@ void setup()
   while (!Serial);
   analogWriteResolution(DACRES);
   analogReadResolution(12);
+  pinMode(PROP_FEEDBACK, INPUT);
   setup_lasers();
   velocitytimer.begin(velocity_manage, 100);
   interrupts();
@@ -79,6 +82,7 @@ void setup_relays() {
   pinMode(CYLINDER_NO, OUTPUT);
   pinMode(DUMP_NO, OUTPUT);
   pinMode(CLICKER, INPUT);
+  pinMode(CAMERA, OUTPUT);
 }
 
 
@@ -175,7 +179,7 @@ void loop()
 
 void printpressurecycle(void) {
    if(pressurereadcounter > timesincepressureread + 2500) {
-    Serial.printf("CANNON/PRESSURE/%d\n",analogRead(PROP_FEEDBACK));
+    Serial.printf("CANNON/PRESSURE/%u\n",analogRead(PROP_FEEDBACK));
     timesincepressureread = pressurereadcounter;
   }
 }
@@ -193,40 +197,42 @@ void handleContact() {
         line = Serial.readStringUntil('\n');
         fire(line.toFloat());
             
+      } else if (line == "AUTO") {
+        for(int i = 0; i < 20; i++) {
+          fire(100);
+          //delay(1000);
+        }
+      } else if(line == "TEST") {
+        testpropreg();
       }
-
+    
+    } else if(line == "stop") {
+      depressurise();
     }
-    /*
-    char c = Serial.read();
-    message += c;
-    Serial.println(message);
-    if (c == '#') {
-      //do stuff
-      message = ""; //clears variable for new input      
-    }
-    else {
-     
-       if (message == "Fire!") {
-              fire();
-              message = "";
-              Serial.println("Firing!");
-       } else if (message == "Setup!") {
-              Serial.write("Setup!");
-              return;
-       }
-        else if (message == "Reload") {
-              reload();
-              message = "";
-        }
-        else if(message == "Pressure") {
-          GetPressure();
-        } else if(message == "Dump") {
-          digitalWrite(DUMP_NO, HIGH);
-          delay(1000);
-        }
-    }
-    */
   }
+}
+float globalpsi = 0;
+
+void testpropreg() {
+  line = Serial.readStringUntil('\n');
+  float psi = line.toFloat();
+  globalpsi = psi;
+  float bar = psi/ 14.5038;
+  long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+  Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
+  analogWrite(A14, valtodac);
+  int reg_val;
+  for(int i = 0; i < 10; i++) {
+    reg_val = analogRead(PROP_FEEDBACK);
+    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+    delay(100);
+  }
+  /*
+  for(valtodac; valtodac > 0; valtodac--){
+    analogWrite(A14, valtodac);
+    delay(10);
+  }
+  */
 }
 
 void laser1Detect() {
@@ -273,13 +279,21 @@ void GetPressure() {
 
 void fire(float psi) {
   //Fire Cannon Function: Solenoid Sequence to Trigger QEV
+  reload();
   Pressurise(psi);
   digitalWrite(TRIGGER_NO, HIGH);
+  Serial.println("CAMERA BEFORE");
+  digitalWrite(CAMERA, HIGH);
+  delay(50);
+  digitalWrite(CAMERA, LOW);
+  Serial.println("CAMEA AFTER");
   delay(VALVE_DELAY);
   digitalWrite(TRIGGER_NC, HIGH);
   delay(DUMP_DELAY);
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
+  Serial.println("FIRE");
+  Pressurise(25);
 }
 
 void reload() {
@@ -290,19 +304,39 @@ void reload() {
   digitalWrite(TANK_NO, LOW);
 }
 
-/* NEED STO BE DFINED ////////////////////////////////////////
-#define REGTHRESHOLD xxxx
-*/ 
+#define REGTHRESHOLD 300
+
+void depressurise() {
+  float bar;
+  long valtodac;
+  int reg_val;
+  for(int i = globalpsi; i > 21.8; i--) { 
+    bar = globalpsi / 14.5038;
+    valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+    analogWrite(A14, valtodac);
+    delay(200);
+    reg_val = analogRead(PROP_FEEDBACK);
+    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+  }
+}
+
 void Pressurise(float psi){
   float bar = psi / 14.5038;
+  globalpsi = psi;
   long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
   Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
   bool atpressure = false;
   int reg_val;
+  for(int i = 0; i < 10; i++) {
+    reg_val = analogRead(PROP_FEEDBACK);
+    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+    delay(100);
+  }
+  /*
   while(!atpressure){
     reg_val = analogRead(PROP_FEEDBACK);  
-    if(reg_val == valtodac) {//- REGTHRESHOLD) {
+    if(reg_val == (valtodac - REGTHRESHOLD)) {
       atpressure = true;
     }
     printpressurecycle();
@@ -311,20 +345,6 @@ void Pressurise(float psi){
       delay(50);
     }
   }
-}
-
-void debug() {
-  Serial.println("Running tests");
-  // Fire all relays
-  for (int i = 3; i > -1; i--) {
-    digitalWrite(i, HIGH);
-    delay(2000);
-    digitalWrite(i, LOW);
-  }
-
-  // Rotate servo from 0 - 90 - 0
-  servo.write(10);
-  delay(2000);
-  servo.write(100);
+  */
 }
 
