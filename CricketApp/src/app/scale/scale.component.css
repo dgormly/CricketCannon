@@ -9,6 +9,10 @@
     width: 70px;
   }
   
+  .data {
+      
+  }
+
   .floating-box {
     display: inline-block;
     width:fit-content;

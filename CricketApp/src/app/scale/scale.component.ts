@@ -33,6 +33,7 @@ export class ScaleComponent implements OnInit {
 
   hasTared: Boolean;
 
+  chart = [];
 
   constructor(private fireService: FireService) {
 

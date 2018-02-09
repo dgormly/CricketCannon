@@ -23,6 +23,7 @@ import { AuthGuard } from './auth-guard.service';
 import { AuthService } from './auth.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { ChartsModule } from 'ng2-charts';
 //import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -60,6 +61,7 @@ import { DashboardComponent } from './dashboard/dashboard.component';
     MatTooltipModule,
     MatTabsModule,
     MatCardModule,
+    ChartsModule
     //NgbModule
   ],
   providers: [AuthService, AuthGuard, FireService, DataService],
