@@ -1,6 +1,5 @@
 import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {FireService} from '../fire.service';
-import {Response} from '../Response';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import * as async from 'async';
 import { nextTick } from 'async';
@@ -16,7 +15,6 @@ export class FireComponent implements OnInit {
   @ViewChild('stepper') stepper;
 
   toggled = false;
-  portNames: Response[] = [];
   selectedPort: string;
   checked = false;
 
@@ -29,9 +27,9 @@ export class FireComponent implements OnInit {
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
+  thirdFormGroup: FormGroup;
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder) {
-    this.fireService.isFiring(this.toggled);
   }
 
   ngOnInit() {
@@ -41,55 +39,36 @@ export class FireComponent implements OnInit {
     this.secondFormGroup = this._formBuilder.group({
       secondCtrl: ['', Validators.required]
     });
-
-    this.getPorts();
-
-    this.fireService.connectSocket();
-  }
-
-  getPorts() {
-    this.fireService.getPorts().subscribe(val => {
-      return this.portNames = val.data
+    this.thirdFormGroup = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required]
     });
   }
 
-  updateSettings(): void {
-    console.log('Port updated');
-    this.fireService.postSettings(this.selectedPort);
-  }
-
-  clear(): void {
-    this.fireService.clearShots();
-  }
 
   fire(pressure: number): void {
-    var count = 0;
-    this.toggled = !this.toggled;
-    console.log('Firing!');
-    console.log(this.balls);
-    this.fireService.isFiring(this.toggled);
+    // var count = 0;
+    // this.toggled = !this.toggled;
+    // console.log('Firing!');
+    // console.log(this.balls);
+    // this.fireService.isFiring(this.toggled);
 
-    async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
-      if (!this.toggled) return;
-      this.fireService.fireCannon( this.pressure, this.ballNames[key % this.ballNames.length]).subscribe(() => {
-        console.log(key);
-        this.currentShotNum++;
-        setTimeout(function() {
-          next();
-        }, 1000)
-      })   /* <---- critical piece.  This is how the forEach knows to continue to
-                           the next loop.  Must be called inside search's callback so that
-                           it   doesn't loop prematurely.*/
-    }, (err) => {
-      if (err) throw err;
-      console.log('Session Finished');
-      this.toggleOff();
-      this.changeStep(4);
-    });
-  }
-
-  saveToCsv(location: string): void {
-    this.fireService.saveFile(location);
+    // async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
+    //   if (!this.toggled) return;
+    //   this.fireService.fireCannon( this.pressure, this.ballNames[key % this.ballNames.length]).subscribe(() => {
+    //     console.log(key);
+    //     this.currentShotNum++;
+    //     setTimeout(function() {
+    //       next();
+    //     }, 1000)
+    //   })   /* <---- critical piece.  This is how the forEach knows to continue to
+    //                        the next loop.  Must be called inside search's callback so that
+    //                        it   doesn't loop prematurely.*/
+    // }, (err) => {
+    //   if (err) throw err;
+    //   console.log('Session Finished');
+    //   this.toggleOff();
+    //   this.changeStep(4);
+    // });
   }
 
   toggleOff() {

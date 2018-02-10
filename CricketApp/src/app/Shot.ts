@@ -4,6 +4,7 @@ export class Shot {
 }
 
 export class Scale {
+  ball: string;
   rw1: number;
   rw2: number;
   rw3: number;

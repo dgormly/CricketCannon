@@ -23,12 +23,10 @@
                 <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
                   <mat-form-field>
-                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="getPorts()" (change)="updateSettings()" formControlName="firstCtrl" required>
-                        <div *ngIf="portNames">
-                          <mat-option *ngFor="let port of portNames" [value]="port.comName">
+                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(selectedPort)" formControlName="firstCtrl" required>
+                          <mat-option *ngFor="let port of fireService.ports" [value]="port.comName">
                             {{ port.comName }}
                           </mat-option>
-                      </div>
                       </mat-select>
                     </mat-form-field>
                     <br/>
@@ -66,21 +64,21 @@
                 </form>
               </mat-step>
               <mat-step [completed]="false">
-                  <form>
+                  <form [formGroup]="thirdFormGroup">
                     <ng-template matStepLabel>Shot list</ng-template>
                       Please fill out the ball names in shooting order.
                       <br/>
                       <div class="floating-box">
                         <div *ngFor="let ball of ballNames; let i = index trackBy:trackByFn">
-                        <mat-form-field >
+                        <mat-form-field>
                           <mat-label>Ball name</mat-label>
-                          <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}">
+                          <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}" formControlName="thirdCtrl" required>
                         </mat-form-field>
                         </div>
                     </div>
                     <div>
                       <button mat-button matSteppe matStepperPrevious>Back</button>
-                      <button mat-button matStepperNext (click)="hasFired = true">Next</button>
+                      <button mat-button matStepperNext>Next</button>
                     </div>
                   </form>
                 </mat-step>
@@ -125,7 +123,7 @@
                   <input matInput #fileLocation placeholder="File name">
                 </mat-form-field>
                 <button mat-button
-                (click)="saveToCsv(fileLocation.value)"
+                (click)="fireService.saveCannonData(fileLocation.value)"
               color="primary">Save
             </button>
                 <div>
@@ -135,7 +133,7 @@
             </mat-horizontal-stepper>
         <mat-action-row>
           <button mat-button
-                  (click)="clear()"
+                  (click)="fireService.clearShots()"
                   color="warn"
                   class="fire-form"  >
             Clear

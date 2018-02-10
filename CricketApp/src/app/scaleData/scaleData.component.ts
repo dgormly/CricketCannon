@@ -9,14 +9,14 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 
 @Component({
   selector: 'app-ScaleData',
-  templateUrl: './ScaleData.component.html',
-  styleUrls: ['./ScaleData.component.css']
+  templateUrl: './scaleData.component.html',
+  styleUrls: ['./scaleData.component.css']
 })
 
 export class ScaleDataComponent implements OnInit {
 
   dataSource: MatTableDataSource<Scale>;
-  displayedColumns = ['rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
+  displayedColumns = ['ball','rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
 
 
   constructor(private fireService: FireService) {

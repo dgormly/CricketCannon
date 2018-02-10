@@ -10,8 +10,8 @@ import { Scale } from './../Shot';
 })
 export class ScaleComponent implements OnInit {
 
-  portNames: Response[] = [];
-  selectedPort: string;
+  fileName: string = "";
+  ballName: string = "";
 
   showData;
   rw1: number[] = [];
@@ -35,13 +35,10 @@ export class ScaleComponent implements OnInit {
 
   chart = [];
 
-  constructor(private fireService: FireService) {
-
-  }
+  constructor(private fireService: FireService) {}
 
 
   ngOnInit() {
-    this.getPorts();
     this.hasTared = this.fireService.tareSubject.getValue();
 
     this.fireService.scaleDataSubject.subscribe(val => {
@@ -74,25 +71,14 @@ export class ScaleComponent implements OnInit {
     return total /= 10;
   }
 
-  getPorts() {
-    this.fireService.getPorts().subscribe(val => {
-      return this.portNames = val.data
-    });
-  }
-
-
-  updateSettings(): void {
-    console.log('Port updated');
-    this.fireService.postSettings(this.selectedPort);
-  }
-
   tare() {
     this.fireService.tare();
   }
 
 
-  displaySample() {
+  displaySample(ballName: string) {
       var scale = new Scale();
+      scale.ball = ballName;
       scale.rw1 = this.sumSample(this.rw1);
       scale.rw2 = this.sumSample(this.rw2);
       scale.rw3 = this.sumSample(this.rw3);
@@ -112,7 +98,7 @@ export class ScaleComponent implements OnInit {
   }
 
   saveScaleData() {
-    this.fireService.saveScaleData();
+    this.fireService.saveScaleData(this.fileName);
     this.fireService.clearScaleData()
   }
 }

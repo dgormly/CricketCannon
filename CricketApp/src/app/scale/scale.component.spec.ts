@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScaleComponent } from './Scale.component';
+import { ScaleComponent } from './scale.component';
 
 describe('ScaleComponent', () => {
   let component: ScaleComponent;

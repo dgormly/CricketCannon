@@ -6,7 +6,7 @@ import { AppComponent } from './app.component';
 import { NavigationComponent } from './navigation/navigation.component';
 import {
   MatButtonModule, MatButtonToggleModule, MatExpansionModule, MatExpansionPanel, MatFormFieldModule, MatInputModule, MatTableModule,
-  MatToolbarModule, MatOptionModule, MatSelectModule, MatCheckboxModule, MatStepperModule, MatProgressBarModule, MatTooltipModule, MatTabsModule, MatCardModule
+  MatToolbarModule, MatOptionModule, MatSelectModule, MatCheckboxModule, MatStepperModule, MatProgressBarModule, MatTooltipModule, MatTabsModule, MatCardModule, MatPaginatorModule
 } from '@angular/material';
 import { AppRoutingModule } from './/app-routing.module';
 import { FireComponent } from './fire/fire.component';
@@ -61,7 +61,8 @@ import { ChartsModule } from 'ng2-charts';
     MatTooltipModule,
     MatTabsModule,
     MatCardModule,
-    ChartsModule
+    ChartsModule,
+    MatPaginatorModule
     //NgbModule
   ],
   providers: [AuthService, AuthGuard, FireService, DataService],

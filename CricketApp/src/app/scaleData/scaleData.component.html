@@ -10,6 +10,11 @@
           The actual rendered columns are set as a property on the row definition" -->
 
     <!-- Id Column -->
+    <ng-container matColumnDef="ball">
+      <mat-header-cell *matHeaderCellDef> Ball </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.ball}} </mat-cell>
+    </ng-container>
+
     <ng-container matColumnDef="rw1">
       <mat-header-cell *matHeaderCellDef> rw1 </mat-header-cell>
       <mat-cell *matCellDef="let scale"> {{scale.rw1}} </mat-cell>
