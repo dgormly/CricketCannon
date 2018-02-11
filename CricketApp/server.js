@@ -1,14 +1,14 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-module.exports.http = require('http');
+const express = require("express");
+const bodyParser = require("body-parser");
+const path = require("path");
+module.exports.http = require("http");
 const app = module.exports.app = express();
-const SerialPort = require('serialport');
+const SerialPort = require("serialport");
 const Readline = SerialPort.parsers.Readline;
 // API file for interacting with MongoDB
-const socketIo = require('socket.io');
-const json2csv = require('json2csv');
-const fs = require('fs');
+const socketIo = require("socket.io");
+const json2csv = require("json2csv");
+const fs = require("fs");
 
 var serialPort;
 
@@ -64,6 +64,7 @@ io.on('connection', (socket) => {
           return console.error('Error on connecting to port: ', err.message);
         }
       });
+      
       serialPort.pipe(parser);
       parser.on("data", function(data) {
         let dataType = data.split(":");
