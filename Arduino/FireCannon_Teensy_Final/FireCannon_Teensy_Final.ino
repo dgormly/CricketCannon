@@ -179,7 +179,7 @@ void loop()
 
 void printpressurecycle(void) {
    if(pressurereadcounter > timesincepressureread + 2500) {
-    Serial.printf("CANNON/PRESSURE/%u\n",analogRead(PROP_FEEDBACK));
+    Serial.printf("CANNON/PRESSURE:%u\n",analogRead(PROP_FEEDBACK));
     timesincepressureread = pressurereadcounter;
   }
 }
@@ -192,7 +192,7 @@ void handleContact() {
   if(Serial.available() > 0) {
     line = Serial.readStringUntil('/');
     if (line == "CANNON") {
-      line = Serial.readStringUntil('/');
+      line = Serial.readStringUntil(':');
       if(line == "FIRE") {
         line = Serial.readStringUntil('\n');
         fire(line.toFloat());
@@ -206,7 +206,7 @@ void handleContact() {
         testpropreg();
       }
     
-    } else if(line == "stop") {
+    } else if(line == "STOP") {
       depressurise();
     }
   }
