@@ -79,7 +79,7 @@ io.on('connection', (socket) => {
 
 
   socket.on('SCALE/TARE', function(data) {
-    scalePort.write('t');;
+    serialPort.write('t');;
   });
 
   socket.on('SCALE/SAVE', function(scaleData) {
@@ -106,6 +106,6 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', function(){
     console.log('user disconnected');
-    scalePort = null;
+    serialPort = null;
   });
 });
