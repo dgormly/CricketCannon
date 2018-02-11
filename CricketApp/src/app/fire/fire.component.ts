@@ -1,5 +1,5 @@
-import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FireService} from '../fire.service';
+import {Component, Input, OnInit, Output, ViewChild, ChangeDetectorRef} from '@angular/core';
+import { FireService } from '../fire.service';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
 import * as async from 'async';
 import { nextTick } from 'async';
@@ -15,13 +15,13 @@ export class FireComponent implements OnInit {
   @ViewChild('stepper') stepper;
 
   toggled = false;
-  selectedPort: string;
   checked = false;
 
   balls: number = 1;
   shots: number = 1;
   currentShotNum = 0;
-  pressure = 0;
+  totalShots = this.balls * this.shots;
+  pressure: number;
   ballNames: string[] = ["ball 0"];
   hasFired: boolean = false;
 
@@ -29,7 +29,17 @@ export class FireComponent implements OnInit {
   secondFormGroup: FormGroup;
   thirdFormGroup: FormGroup;
 
-  constructor(private fireService: FireService, private _formBuilder: FormBuilder) {
+  constructor(private fireService: FireService, private _formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
+    var that = this;
+    this.fireService.socket.on('CANNON/RESULTS', function(data) {
+      // Deconstruct results to variables.
+
+      that.currentShotNum++;
+      if (that.fireService.firingMessage && that.currentShotNum < that.totalShots) {
+        that.fire(that.pressure);
+      }
+    });
+
   }
 
   ngOnInit() {
@@ -44,13 +54,11 @@ export class FireComponent implements OnInit {
     });
   }
 
-
   fire(pressure: number): void {
-    // var count = 0;
-    // this.toggled = !this.toggled;
-    // console.log('Firing!');
-    // console.log(this.balls);
-    // this.fireService.isFiring(this.toggled);
+    this.toggled = !this.toggled;
+    console.log('Firing!');
+    this.fireService.isFiring(this.toggled);
+    this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
 
     // async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
     //   if (!this.toggled) return;
@@ -67,7 +75,7 @@ export class FireComponent implements OnInit {
     //   if (err) throw err;
     //   console.log('Session Finished');
     //   this.toggleOff();
-    //   this.changeStep(4);
+    //   this.changeStep(4);  
     // });
   }
 
@@ -84,8 +92,9 @@ export class FireComponent implements OnInit {
 
   setBallNum(numBrands: number) {
     console.log('number: ', this.ballNames);
-    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball " + i);
+    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball name");
     console.log(this.ballNames);
+    this.cdr.detectChanges();
   }
 
   /**

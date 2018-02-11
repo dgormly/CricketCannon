@@ -16,8 +16,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 export class ScaleDataComponent implements OnInit {
 
   dataSource: MatTableDataSource<Scale>;
-  displayedColumns = ['ball','rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
-
+  displayedColumns = ['No.', 'ball','rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"];
 
   constructor(private fireService: FireService) {
     this.dataSource = new MatTableDataSource();

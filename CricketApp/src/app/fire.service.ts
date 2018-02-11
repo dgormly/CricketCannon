@@ -4,7 +4,6 @@ import {Shot, Scale } from './Shot';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {tap} from 'rxjs/operators';
-import {SHOTS} from './mock-shots';
 import { Subject } from 'rxjs/Subject';
 import * as socketIo from 'socket.io-client';
 
@@ -13,9 +12,9 @@ import * as socketIo from 'socket.io-client';
 export class FireService {
 
   ports: any = [];
-  selectedPort: any = "";
+  selectedPort: any;
 
-  shots = new BehaviorSubject<Shot[]>(SHOTS);
+  shots = new BehaviorSubject<Shot[]>([]);
   private firingSubject = new BehaviorSubject<boolean>(false);
   firingMessage = this.firingSubject.asObservable();
   shotData = this.shots.asObservable();
@@ -23,12 +22,12 @@ export class FireService {
   currentShots = this.cShots.asObservable();
   private cScale = new BehaviorSubject<Scale[]>([]);
   scaleData = this.cScale.asObservable();
-  private socket;
+  socket;
   currentPressure;
   scaleDataSubject = new BehaviorSubject<String>("");
   tareSubject = new BehaviorSubject<Boolean>(false);
 
-  constructor(private http: HttpClient) {
+  constructor() {
     var that = this;
     this.socket = socketIo('http://localhost:5000');
 
@@ -43,7 +42,7 @@ export class FireService {
     });
 
 
-    this.socket.on('PORT/SELECT', function(data) {
+    this.socket.on('PORT/SET', function(data) {
       if (data.toString() === "OK") {
         console.log("Successfully connected scale comms");
       } else {
@@ -59,12 +58,20 @@ export class FireService {
     this.socket.on('SCALE/ERROR', function(data) {
       console.log(data);
     });
+
+    this.socket.on('PORT/ERROR', function(data) {
+      this.selectedPort = "";
+    });
+
     this.getPorts();
   }
 
 
-  setPort(portName: string) {
-    this.socket.emit('PORT/SELECT', portName);
+  setPort(portName: string, baud: number): void {
+    this.socket.emit('PORT/SET', {
+      port: portName,
+      baud: baud
+    });
   }
 
   getPorts() {
@@ -72,11 +79,14 @@ export class FireService {
   }
 
 
-  fireCannon(pressureValue: number, ballName: string): Observable<Object> {
-    return null;
+  fireCannon(pressureValue: number, ballName: string): void {
+    this.socket.emit('CANNON/FIRE', {
+      pressure: pressureValue,
+      ball: ballName
+    });
   }
 
-  isFiring(data: boolean): void{
+  isFiring(data: boolean): void {
     this.firingSubject.next(data);
   }
 

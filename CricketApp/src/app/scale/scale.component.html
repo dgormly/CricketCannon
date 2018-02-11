@@ -11,7 +11,7 @@
     </mat-card-header>
     <mat-card-content>
       <mat-form-field>
-        <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(selectedPort)">
+        <mat-select placeholder="Comm Port" [(value)]="fireService.selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(fireService.selectedPort, 115200)">
             <mat-option *ngFor="let port of fireService.ports" [value]="port.comName">
               {{ port.comName }}
             </mat-option>
@@ -36,7 +36,7 @@
           [disabled]="fileName == '' || fireService.selectedPort == '' || ballName == ''"
           color="accent"
           (click)="saveScaleData()">
-          Export
+          Save
           </button>  
         </mat-card-actions>
   </mat-card-content>

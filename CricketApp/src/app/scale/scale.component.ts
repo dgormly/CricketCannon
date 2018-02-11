@@ -28,6 +28,7 @@ export class ScaleComponent implements OnInit {
   deltaY: number[] = [];
   distX: number[] = [];
   distY: number[] = [];
+  sampleNo: number = 0;
   count = 0;
 
 
@@ -93,12 +94,16 @@ export class ScaleComponent implements OnInit {
       scale.deltaY = this.sumSample(this.deltaY);
       scale.distX = this.sumSample(this.distX);
       scale.distY = this.sumSample(this.distY);
+      scale.sampleNo = this.sampleNo;
+
       this.fireService.addScale(scale);
+      this.sampleNo++;
       this.count = this.rw1.length;
   }
 
   saveScaleData() {
     this.fireService.saveScaleData(this.fileName);
-    this.fireService.clearScaleData()
+    this.fireService.clearScaleData();
+    this.sampleNo = 0;
   }
 }

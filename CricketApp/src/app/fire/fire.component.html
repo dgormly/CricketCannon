@@ -18,12 +18,12 @@
           {{ (shots * balls - currentShotNum)}}
         </mat-panel-description>
       </mat-expansion-panel-header>
-            <mat-horizontal-stepper [linear]="!checked" #stepper>
+            <mat-horizontal-stepper [linear]="false" #stepper>
               <mat-step [completed]="false" [stepControl]="firstFormGroup">
                 <form [formGroup]="firstFormGroup">
                   <ng-template matStepLabel>Cannon Settings</ng-template>
                   <mat-form-field>
-                      <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(selectedPort)" formControlName="firstCtrl" required>
+                      <mat-select placeholder="Comm Port" [(value)]="fireService.selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(fireService.selectedPort, 9600)" formControlName="firstCtrl" required>
                           <mat-option *ngFor="let port of fireService.ports" [value]="port.comName">
                             {{ port.comName }}
                           </mat-option>
@@ -58,7 +58,7 @@
                       </mat-form-field>
                     </div>
                   <div>
-                    <button mat-button matSteppe matStepperPrevious>Back</button>
+                    <button mat-button matStepperPrevious>Back</button>
                     <button mat-button matStepperNext (click)="setBallNum(balls)">Next</button>
                   </div>
                 </form>
@@ -77,7 +77,7 @@
                         </div>
                     </div>
                     <div>
-                      <button mat-button matSteppe matStepperPrevious>Back</button>
+                      <button mat-button matStepperPrevious>Back</button>
                       <button mat-button matStepperNext>Next</button>
                     </div>
                   </form>
