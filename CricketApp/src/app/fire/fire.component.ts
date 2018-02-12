@@ -55,9 +55,11 @@ export class FireComponent implements OnInit {
   }
 
   fire(pressure: number): void {
-    this.toggled = !this.toggled;
-    console.log('Firing!');
-    this.fireService.isFiring(this.toggled);
+    console.log("Firing!");
+    if (!this.toggled) {
+      this.toggled = !this.toggled;
+      this.fireService.isFiring(this.toggled);
+    }
     this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
 
     // async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {

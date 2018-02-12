@@ -70,8 +70,8 @@ io.on('connection', (socket) => {
         let dataType = data.split(":");
         io.emit(dataType[0], dataType[1]);
 
-        if (dataType[0] === "CANNON/RESULT") {
-          // TODO put shot in db.
+        if (dataType[0] === "CANNON/RESULTS") {
+          console.log("Fire results.");
         }
 
       });
