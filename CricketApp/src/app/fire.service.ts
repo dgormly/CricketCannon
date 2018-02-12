@@ -13,19 +13,22 @@ export class FireService {
 
   ports: any = [];
   selectedPort: any;
-  cannonResults = new BehaviorSubject<string>("");
-
+  private cannonResults = new BehaviorSubject<string>("");
+  cannonResults$ = this.cannonResults.asObservable();
 
   shots = new BehaviorSubject<Shot[]>([]);
   private firingSubject = new BehaviorSubject<boolean>(false);
-  firingMessage = this.firingSubject.asObservable();
+  private firingMessage = this.firingSubject.asObservable();
   shotData = this.shots.asObservable();
   private cShots = new BehaviorSubject<Shot[]>([]);
   currentShots = this.cShots.asObservable();
   private cScale = new BehaviorSubject<Scale[]>([]);
   scaleData = this.cScale.asObservable();
   socket;
-  currentPressure;
+
+  private currentPressure = new BehaviorSubject<number>(0);
+  currentPressure$ = this.currentPressure.asObservable();
+
   scaleDataSubject = new BehaviorSubject<String>("");
   tareSubject = new BehaviorSubject<Boolean>(false);
 
@@ -43,6 +46,10 @@ export class FireService {
       console.log('Ports setup');
     });
 
+    this.socket.on('CANNON/PRESSURE', function(data) {
+      that.currentPressure.next(data);
+    });
+
 
     this.socket.on('PORT/SET', function(data) {
       if (data.toString() === "OK") {
@@ -58,7 +65,8 @@ export class FireService {
     });
 
     this.socket.on('CANNON/RESULTS', function(data) {
-      this.cannonResults.next(data);
+      console.log("Cannon results - client");
+      that.cannonResults.next(data);
     });
 
     this.socket.on('SCALE/ERROR', function(data) {

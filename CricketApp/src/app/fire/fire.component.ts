@@ -20,8 +20,8 @@ export class FireComponent implements OnInit {
   balls: number = 1;
   shots: number = 1;
   currentShotNum = 0;
-  totalShots = this.balls * this.shots;
-  pressure: number;
+  totalShots = 0;
+  pressure: number = 0;
   ballNames: string[] = ["ball 0"];
   hasFired: boolean = false;
 
@@ -44,7 +44,7 @@ export class FireComponent implements OnInit {
     });
 
     var that = this;
-    this.fireService.cannonResults.subscribe( data => {
+    this.fireService.cannonResults$.subscribe( data => {
       that.currentShotNum++;
       if (that.currentShotNum < that.totalShots) {
         that.fire(that.pressure);
@@ -53,12 +53,19 @@ export class FireComponent implements OnInit {
   
   }
 
+  beginFiring(pressure: number): void {
+    this.toggled = true;
+    this.hasFired = true;
+    this.fire(pressure);
+  }
+
   fire(pressure: number): void {
     console.log("Firing!");
     if (!this.toggled) {
-      this.toggled = !this.toggled;
-      this.fireService.isFiring(this.toggled);
+      return;
     }
+
+    this.totalShots = this.balls * this.shots;
     this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
 
     // async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {

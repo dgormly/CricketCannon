@@ -56,11 +56,11 @@ io.on('connection', (socket) => {
   socket.on('PORT/SET', function(data) {
     let parser = new Readline();
     console.log("Setting up scale comm");
-      serialPort = new SerialPort(data.port,{
+      serialPort = new SerialPort(data.port, {
         baudRate: data.baud
       }, function(err) {
         if (err) {
-          that.io.emit('PORT/ERROR', 'Error on connecting to port.');
+          socket.emit('PORT/ERROR', 'Error on connecting to port.');
           return console.error('Error on connecting to port: ', err.message);
         }
       });
@@ -68,7 +68,8 @@ io.on('connection', (socket) => {
       serialPort.pipe(parser);
       parser.on("data", function(data) {
         let dataType = data.split(":");
-        io.emit(dataType[0], dataType[1]);
+        console.log(dataType[0].trim());
+        io.sockets.emit(dataType[0].trim(), dataType[1]);
 
         if (dataType[0] === "CANNON/RESULTS") {
           console.log("Fire results.");
@@ -101,6 +102,7 @@ io.on('connection', (socket) => {
 
   socket.on('CANNON/FIRE', function(data) {
     console.log("Firing cannon.");
+    console.log(data.pressure);
     serialPort.write("CANNON/FIRE/" + data.pressure);
   });
 

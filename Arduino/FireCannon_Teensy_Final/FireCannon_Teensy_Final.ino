@@ -179,7 +179,7 @@ void loop()
 
 void printpressurecycle(void) {
    if(pressurereadcounter > timesincepressureread + 2500) {
-    Serial.printf("CANNON/PRESSURE/%u\n",analogRead(PROP_FEEDBACK));
+    Serial.printf("CANNON/PRESSURE:%u\n",analogRead(PROP_FEEDBACK));
     timesincepressureread = pressurereadcounter;
   }
 }
@@ -293,7 +293,7 @@ void fire(float psi) {
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
   Pressurise(25);
-  Serial.println("CANNON/RESULTS:DUMBY", psi);
+  Serial.println("CANNON/RESULTS:DUMMY");
 }
 
 void reload() {
