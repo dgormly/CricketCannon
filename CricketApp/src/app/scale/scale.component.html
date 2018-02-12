@@ -1,5 +1,5 @@
 
-<div style="margin: auto; overflow: hidden; width: 600px;">
+<div style="margin: auto; overflow: hidden; width: 1200px;">
   <mat-card id="card-form" style="float: left; height: 250px; width: 200px; margin: 16px;">
     <mat-card-header>
       <mat-card-title>
@@ -42,8 +42,7 @@
   </mat-card-content>
   </mat-card>
   
-  
-  <mat-card id="card-form" style="float: right; height: 250px; margin: 16px; width: 200px;">
+  <mat-card id="card-form" style="float: left; height: 250px; margin: 16px; width: 200px;">
     <mat-card-header>
       <mat-card-title>
       Data
@@ -53,7 +52,6 @@
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      Sample Count: {{ count }} <br />
       Raw: A:{{ rw1[count-1] }} B:{{ rw2[count-1]  }} C:{{ rw3[count-1]  }} <br />
       Sum: {{ sum[count-1]  }} <br />
       W1: X: {{ w1x[count-1]  }} Y: {{ w1y[count-1]  }} <br />
@@ -72,5 +70,12 @@
       </button>
       </mat-card-actions>
   </mat-card-content>
+  </mat-card>
+  <mat-card id="card-form" style="float: left; height: 250px; margin: 16px; width: 500px;">
+        <mat-card-content>
+          <div>
+          <chart #balanceChart [type]="type" [data]="data" [options]="options"></chart>
+        </div>
+        </mat-card-content>
   </mat-card>
   </div>

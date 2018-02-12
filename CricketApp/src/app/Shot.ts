@@ -1,10 +1,12 @@
 export class Shot {
   id: number;
+  shotType: string;
   shotCount: number;
   name: string;
   force: number = -1;
   velocity: number = -1;
   displacement: number = -1;
+  shotPressure: number;
 }
 
 export class Scale {

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 //import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import {FireService} from '../fire.service';
 import { Scale } from './../Shot';
@@ -8,7 +8,7 @@ import { Scale } from './../Shot';
   templateUrl: './scale.component.html',
   styleUrls: ['./scale.component.css']
 })
-export class ScaleComponent implements OnInit {
+export class ScaleComponent implements OnInit { 
 
   fileName: string = "";
   ballName: string = "";
@@ -31,12 +31,37 @@ export class ScaleComponent implements OnInit {
   sampleNo: number = 0;
   count = 0;
 
+  type = 'scatter';
+  data: {
+      datasets: [{
+          label: 'Scatter Dataset',
+          data: [{
+              x: -0.5,
+              y: 0
+          }, {
+              x: 0,
+              y: -0.5
+          }, {
+              x: 0.5,
+              y: 0.7
+          }]
+      }]
+  };
+  options: {
+      scales: {
+          xAxes: [{
+              type: 'linear',
+              position: 'bottom'
+          }]
+      }
+  }
+
 
   hasTared: Boolean;
 
-  chart = [];
-
-  constructor(private fireService: FireService) {}
+  constructor(private fireService: FireService) {
+    this.chart.chart.update();
+  }
 
 
   ngOnInit() {
