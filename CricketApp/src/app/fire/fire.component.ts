@@ -30,18 +30,8 @@ export class FireComponent implements OnInit {
   thirdFormGroup: FormGroup;
 
   constructor(private fireService: FireService, private _formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
-    var that = this;
-    this.fireService.socket.on('CANNON/RESULTS', function(data) {
-      // Deconstruct results to variables.
-
-      that.currentShotNum++;
-      if (that.fireService.firingMessage && that.currentShotNum < that.totalShots) {
-        that.fire(that.pressure);
-      }
-    });
 
   }
-
   ngOnInit() {
     this.firstFormGroup = this._formBuilder.group({
       firstCtrl: ['', Validators.required]
@@ -52,6 +42,15 @@ export class FireComponent implements OnInit {
     this.thirdFormGroup = this._formBuilder.group({
       thirdCtrl: ['', Validators.required]
     });
+
+    var that = this;
+    this.fireService.cannonResults.subscribe( data => {
+      that.currentShotNum++;
+      if (that.currentShotNum < that.totalShots) {
+        that.fire(that.pressure);
+      }
+    });
+  
   }
 
   fire(pressure: number): void {

@@ -60,7 +60,6 @@ export class ScaleComponent implements OnInit {
   hasTared: Boolean;
 
   constructor(private fireService: FireService) {
-    this.chart.chart.update();
   }
 
 

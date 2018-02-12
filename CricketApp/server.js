@@ -101,7 +101,7 @@ io.on('connection', (socket) => {
 
   socket.on('CANNON/FIRE', function(data) {
     console.log("Firing cannon.");
-    serialPort.write("CANNON/FIRE:" + data.pressure);
+    serialPort.write("CANNON/FIRE/" + data.pressure);
   });
 
   socket.on('disconnect', function(){

@@ -13,6 +13,8 @@ export class FireService {
 
   ports: any = [];
   selectedPort: any;
+  cannonResults = new BehaviorSubject<string>("");
+
 
   shots = new BehaviorSubject<Shot[]>([]);
   private firingSubject = new BehaviorSubject<boolean>(false);
@@ -53,6 +55,10 @@ export class FireService {
     this.socket.on('SCALE/TARE', function(data) {
       console.log("Tare complete!");
       that.tareSubject.next(true);
+    });
+
+    this.socket.on('CANNON/RESULTS', function(data) {
+      this.cannonResults.next(data);
     });
 
     this.socket.on('SCALE/ERROR', function(data) {

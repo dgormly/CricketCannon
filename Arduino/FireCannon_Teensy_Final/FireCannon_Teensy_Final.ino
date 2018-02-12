@@ -293,7 +293,7 @@ void fire(float psi) {
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
   Pressurise(25);
-  Serial.println("CANNON/RESULTS:%d", psi);
+  Serial.println("CANNON/RESULTS:DUMBY", psi);
 }
 
 void reload() {
