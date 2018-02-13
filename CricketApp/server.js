@@ -5,10 +5,17 @@ module.exports.http = require("http");
 const app = module.exports.app = express();
 const SerialPort = require("serialport");
 const Readline = SerialPort.parsers.Readline;
-// API file for interacting with MongoDB
 const socketIo = require("socket.io");
 const json2csv = require("json2csv");
 const fs = require("fs");
+const sqlite3 = require("sqlite3");
+
+// let db = new sqlite3.Database('./Data/database.db', sqlite3.OPEN_READWRITE, (err) => {
+//   if (err) {
+//     console.error(err.message);
+//   }
+//   console.log("Connected to the database.")
+// });
 
 var serialPort;
 
@@ -104,6 +111,12 @@ io.on('connection', (socket) => {
     console.log("Firing cannon.");
     console.log(data.pressure);
     serialPort.write("CANNON/FIRE/" + data.pressure);
+  });
+
+  socket.on('CANNON/STOP', function() {
+    if (serialPort) {
+    serialPort.write("CANNON/STOP");
+    }
   });
 
   socket.on('disconnect', function(){

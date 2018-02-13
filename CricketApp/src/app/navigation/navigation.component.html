@@ -1,3 +1,3 @@
 <mat-toolbar color="primary">
-  <span>🏏 {{ pressureValue }} </span>
+  <span>🏏<span *ngIf="pressureValue > 0"> {{ pressureValue }}</span></span>
 </mat-toolbar>

@@ -22,7 +22,7 @@ export class FireService {
   shotData = this.shots.asObservable();
   private cShots = new BehaviorSubject<Shot[]>([]);
   currentShots = this.cShots.asObservable();
-  private cScale = new BehaviorSubject<Scale[]>([]);
+  cScale = new BehaviorSubject<Scale[]>([]);
   scaleData = this.cScale.asObservable();
   socket;
 
@@ -98,6 +98,10 @@ export class FireService {
       pressure: pressureValue,
       ball: ballName
     });
+  }
+
+  stopCannon(): void {
+    this.socket.emit('CANNON/STOP');
   }
 
   isFiring(data: boolean): void {

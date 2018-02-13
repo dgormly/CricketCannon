@@ -31,30 +31,48 @@ export class ScaleComponent implements OnInit {
   sampleNo: number = 0;
   count = 0;
 
-  type = 'scatter';
-  data: {
-      datasets: [{
-          label: 'Scatter Dataset',
-          data: [{
-              x: -0.5,
-              y: 0
-          }, {
-              x: 0,
-              y: -0.5
-          }, {
-              x: 0.5,
-              y: 0.7
-          }]
-      }]
-  };
-  options: {
-      scales: {
-          xAxes: [{
-              type: 'linear',
-              position: 'bottom'
-          }]
+  type = 'bar';
+  data = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    datasets: [
+      {
+        label: 'My First dataset',
+        data: [65, 59, 80, 81, 56, 55, 40],
+        backgroundColor: '#FF6384'
+      },
+      {
+        label: 'My Second dataset',
+        data: [60, 65, 75, 86, 49, 42, 35],
+        backgroundColor: '#36A2EB'
       }
-  }
+    ]
+  };
+  options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      xAxes: [
+        {
+          stacked: true
+        }
+      ],
+      yAxes: [
+        {
+          stacked: true
+        }
+      ]
+    },
+
+    // Container for zoom options
+    zoom: {
+      // Boolean to enable zooming
+      enabled: true,
+
+      // Zooming directions. Remove the appropriate direction to disable 
+      // Eg. 'y' would only allow zooming in the y direction
+      mode: 'xy',
+    }
+  };
 
 
   hasTared: Boolean;

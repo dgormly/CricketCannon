@@ -48,6 +48,8 @@ export class FireComponent implements OnInit {
       that.currentShotNum++;
       if (that.currentShotNum < that.totalShots) {
         that.fire(that.pressure);
+      } else {
+        this.toggleOff();
       }
     });
   
@@ -90,6 +92,7 @@ export class FireComponent implements OnInit {
   toggleOff() {
     this.toggled = false;
     this.fireService.isFiring(this.toggled);
+    this.fireService.stopCannon();
   }
 
   sleep(ms){
