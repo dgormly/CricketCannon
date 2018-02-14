@@ -6,8 +6,10 @@
   "license": "MIT",
   "main": "main.js",
   "scripts": {
+    "install": "electron-rebuild",
     "start": "node server && node start.js",
-    "serve": "ng build & npm start"
+    "serve": "ng build & npm start",
+    "electron": "electron ."
   },
   "engines": {
     "node": "~6.10.3",
@@ -46,7 +48,6 @@
     "serialport": "^6.1.0",
     "socket.io": "^2.0.4",
     "socket.io-client": "^2.0.4",
-    "sqlite3": "^3.1.13",
     "web-animations-js": "^2.3.1",
     "zone.js": "^0.8.20"
   },
@@ -57,7 +58,9 @@
     "@types/jasminewd2": "~2.0.2",
     "@types/node": "^6.0.100",
     "codelyzer": "^4.1.0",
+    "electron": "^1.8.2",
     "electron-packager": "^10.1.2",
+    "electron-rebuild": "^1.7.3",
     "electron-winstaller": "^2.6.4",
     "jasmine-core": "~2.6.2",
     "jasmine-spec-reporter": "~4.1.0",

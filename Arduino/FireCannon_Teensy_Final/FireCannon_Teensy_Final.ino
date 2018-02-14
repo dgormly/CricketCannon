@@ -192,7 +192,7 @@ void handleContact() {
   if(Serial.available() > 0) {
     line = Serial.readStringUntil('/');
     if (line == "CANNON") {
-      line = Serial.readStringUntil('/');
+      line = Serial.readStringUntil(':');
       if(line == "FIRE") {
         line = Serial.readStringUntil('\n');
         fire(line.toFloat());
