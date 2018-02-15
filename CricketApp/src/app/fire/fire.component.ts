@@ -53,6 +53,9 @@ export class FireComponent implements OnInit {
   }
 
   beginFiring(pressure: number): void {
+    if (this.checked) {
+      this.totalShots = 1;
+    }
     this.toggled = true;
     this.fire(pressure);
   }

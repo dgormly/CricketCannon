@@ -7,7 +7,7 @@
         <mat-panel-title>
           Cannon Wizard
         </mat-panel-title>
-        <mat-panel-description *ngIf="currentShotNum > 0">
+        <mat-panel-description *ngIf="currentShotNum > 0 && totalShots > 0">
           Next: {{ ballNames[currentShotNum % ballNames.length] }}
           <mat-progress-bar
           color="warn"
