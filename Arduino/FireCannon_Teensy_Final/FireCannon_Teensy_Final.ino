@@ -2,7 +2,7 @@
 
 
 //Proportional Regulator Stuff/////////////////////////
-const int PROP_FEEDBACK = 14;
+#define PROP_FEEDBACK 14
                        // outside leads to ground and +5V
 int val = 0;           // variable to store the value read
 char buffer1[50];
@@ -205,6 +205,29 @@ void printpressurecycle(void) {
 
 String line;
 
+void reload_ball(void) {
+  backservo.write(50);
+  delay(500);
+  backservo.write(5);
+  frontservo.write(100);
+  delay(250);
+  frontservo.write(175); 
+}
+
+void fireSequence(float pressure) {
+  reload_ball();
+  if(communicationsIncoming())
+    break;
+  int pressurestatus = PressuriseAndWait(pressure);
+  if(pressurestatus == 2 || pressurestatus == 0) {
+    return; //comms incoming for 2, error for 0. either way want to exit
+  }
+  fire();
+  if(communicationsIncoming())
+    break;
+  PressureToReg(
+}
+
 void handleContact() {
   // If we get a valid byte, read analog ins:
   // get incoming byte:
@@ -214,18 +237,13 @@ void handleContact() {
       line = Serial.readStringUntil('/');
       if(line == "FIRE") {
         line = Serial.readStringUntil('\n');
-        fire(line.toFloat());
+        fireSequence(line.toFloat());
             
       } else if (line == "AUTO") {
         for(int i = 0; i < 40; i++) {
           fire(90);
           delay(300);
-          backservo.write(50);
-          delay(500);
-          backservo.write(5);
-          frontservo.write(100);
-          delay(250);
-          frontservo.write(175);
+          reload_ball();
         }
       } else if(line == "TEST") {
         testpropreg();
@@ -275,6 +293,13 @@ void testpropreg() {
   */
 }
 
+bool CommunicationsIncoming(void) {
+  if (Serial.available() > 0) {
+    return true;
+  }
+  return false;
+}
+
 void laser1Detect() {
   ballhaspassed_1 = 1;
 }
@@ -317,16 +342,9 @@ void GetPressure() {
   }
 }
 
-void fire(float psi) {
+void fire() {
   //Fire Cannon Function: Solenoid Sequence to Trigger QEV
   reload();
-  Pressurise(psi);
-  if(globalstop == true) {
-    Serial.println("Depressurising");
-    depressurise();
-    globalstop = false;
-    return;
-  }
   digitalWrite(TRIGGER_NO, HIGH);
   Serial.println("CAMERA BEFORE");
   digitalWrite(CAMERA, HIGH);
@@ -338,13 +356,10 @@ void fire(float psi) {
   delay(DUMP_DELAY);
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
-  Pressurise(25);
-  Serial.println("CANNON/RESULTS:DUMMY");
 }
 
 void reload() {
   //Reload Cannon Function: Closes Tank Valve to Close QEV.
-  //delay(2000);
   digitalWrite(TANK_NO, HIGH);
   delay(TANK_DELAY);
   digitalWrite(TANK_NO, LOW);
@@ -367,42 +382,56 @@ void depressurise() {
   }
 }
 
-void Pressurise(float psi){
-  float bar = psi / 14.5038;
-  globalpsi = psi;
-  long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
-  Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
+void pressureToReg(int valtodac) {
+  if(DEBUG)
+    Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
-  bool atpressure = false;
+}
+
+/*
+ * Waits for pressure to reach the desired pressure, found in globalpsi that is set in the PressueToReg function
+ * returns 0 for error, 1 for at pressure, 2 for comms inbound
+ */
+int checkPressure(int valtodac) {
   int reg_val;
-  /*
-  for(int i = 0; i < 10; i++) {
-    reg_val = analogRead(PROP_FEEDBACK);
-    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
-    delay(100);
-  }
-  */
+  long expected_feedback = map(valtodac, 0, pow(2, DACRES), 0 , 2800);
   while(!atpressure){
-    if(Serial.available() > 0) {
-      line = Serial.readStringUntil('/');
-      if(line == "CANNON") {
-        line = Serial.readStringUntil('\n');
-        if(line == "STOP") {
-          globalstop = true;
-          return;
-        }
-      }
-    }
+    if(communicationsIncoming())
+      return 2;
     reg_val = analogRead(PROP_FEEDBACK);
-    long expected_feedback = map(valtodac, 0, pow(2, DACRES), 0 , 2800);
     if((reg_val >= (expected_feedback - REGTHRESHOLD)) && (reg_val <= (expected_feedback + REGTHRESHOLD))) {
-      atpressure = true;
+      return 1;
     }
     printpressurecycle();
     if(DEBUG){
-      Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, expected_feedback);
+      Serial.printf("CANNON/DEBUG:{'Reading from PropReg': %d,'Desired': %d}\n", reg_val, expected_feedback);
       delay(50);
     }
+  } 
+}
+
+/*
+ * Returns an integer value necessary to get an appropriate voltage at the pressure regulator for
+ * setting PSI output
+ */
+int mapToReg(float psi) {
+  bar = psi / 14.5038;
+  return map(bar, 1.5, 7, 0, pow(2, DACRES));
+}
+
+/*
+ * returns 0 for error, 1 for at pressure, 2 for comms inbound
+ */
+void PressuriseAndWait(float psi){
+  globalpsi = psi;
+  pressureToReg(mapToReg(psi));
+  int pressurestatus = checkPressure(mapToReg(psi));
+  if( pressurestatus == 2) {
+    return 2;
+  } else if _pressurestatus = 1){
+    return 1;
+  } else {
+    return 0;
   }
 }
 
