@@ -1,8 +1,6 @@
 import {Component, Input, OnInit, Output, ViewChild, ChangeDetectorRef} from '@angular/core';
 import { FireService } from '../fire.service';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import * as async from 'async';
-import { nextTick } from 'async';
 
 
 @Component({
@@ -22,8 +20,7 @@ export class FireComponent implements OnInit {
   currentShotNum = 0;
   totalShots = 0;
   pressure: number = 0;
-  ballNames: string[] = ["ball 0"];
-  hasFired: boolean = false;
+  ballNames: string[] = ["ball ID"];
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -57,7 +54,6 @@ export class FireComponent implements OnInit {
 
   beginFiring(pressure: number): void {
     this.toggled = true;
-    this.hasFired = true;
     this.fire(pressure);
   }
 
@@ -91,8 +87,8 @@ export class FireComponent implements OnInit {
 
   toggleOff() {
     this.toggled = false;
-    this.fireService.isFiring(this.toggled);
     this.fireService.stopCannon();
+    console.log("Finished firing session.");
   }
 
   sleep(ms){
@@ -103,7 +99,7 @@ export class FireComponent implements OnInit {
 
   setBallNum(numBrands: number) {
     console.log('number: ', this.ballNames);
-    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball name");
+    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball ID");
     console.log(this.ballNames);
     this.cdr.detectChanges();
   }

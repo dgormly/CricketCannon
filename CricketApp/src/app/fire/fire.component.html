@@ -7,7 +7,7 @@
         <mat-panel-title>
           Cannon Wizard
         </mat-panel-title>
-        <mat-panel-description *ngIf="hasFired">
+        <mat-panel-description *ngIf="currentShotNum > 0">
           Next: {{ ballNames[currentShotNum % ballNames.length] }}
           <mat-progress-bar
           color="warn"
@@ -71,7 +71,7 @@
                       <div class="floating-box">
                         <div *ngFor="let ball of ballNames; let i = index trackBy:trackByFn">
                         <mat-form-field>
-                          <mat-label>Ball name</mat-label>
+                          <mat-label>Ball ID</mat-label>
                           <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}" formControlName="thirdCtrl" required>
                         </mat-form-field>
                         </div>
