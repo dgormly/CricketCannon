@@ -8,7 +8,7 @@ const Readline = SerialPort.parsers.Readline;
 const socketIo = require("socket.io");
 const json2csv = require("json2csv");
 const fs = require("fs");
-const logger = require("./server/console_logger.js");
+const colors = require("colors");
 
 //const sqlite3 = require("sqlite3");
 
@@ -31,29 +31,29 @@ app.use(express.static(path.join(__dirname, 'dist')));
 // API location
 // Send all other requests to the Angular app
 app.get('*', (req, res) => {
-  logger.log("connection detected");
+  console.log("[SERVER]: Connection detected".green);
   res.sendFile(path.join(__dirname, './dist/index.html'));
 });
 
-logger.log("Starting server up.");
+console.log("[SERVER]: Starting server up.");
 //Set Port
 const port = '5000';
 app.set('port', port);
-logger.log("SUCCESS", "Successfully setup port");
+console.log("[SERVER]: Successfully setup port".green);
 
-const server = module.exports.server = module.exports.http.createServer(app);
+const server = http.createServer(app);
 
 server.listen(port, () => {
-  logger.log("NORMAL",`Running on localhost:${port}`)
+  console.log(`[SERVER]: Running on localhost:${port}`)
 });
 
 
 // Socket setup
-logger.log("NORMAL", "Setting up sockets.");
+console.log("[SERVER]: Setting up sockets.");
 const io = module.exports.io = socketIo(server);
 var that = this;
 io.on('connection', (socket) => {
-  logger.log("SUCCESS", 'The client connected');
+  console.log('[SERVER]: The client connected'.green);
   module.exports.client = socket;
 
   socket.on('PORT/GET', function() {
@@ -64,24 +64,26 @@ io.on('connection', (socket) => {
 
   socket.on('PORT/SET', function(data) {
     let parser = new Readline();
-    logger.log("NORMAL", "Setting up scale comm");
+    console.log("[SERVER]: Setting up scale comm");
       serialPort = new SerialPort(data.port, {
         baudRate: data.baud
       }, function(err) {
         if (err) {
           socket.emit('PORT/ERROR', 'Error on connecting to port.');
-          return logger.log("ERROR",'Error on connecting to port: ', err.message);
+          return console.log(colors.red('[SERVER]: Error on connecting to port: ', err.message));
         }
       });
       
       serialPort.pipe(parser);
       parser.on("data", function(data) {
         let dataType = data.split(":");
-//        logger.log("DEBUG",dataType[0].trim());
+//        console.log("DEBUG",dataType[0].trim());
         io.sockets.emit(dataType[0].trim(), dataType[1]);
 
         if (dataType[0] === "CANNON/RESULTS") {
-          logger.log("RESULTS","Fire results.");
+          console.log("[RESULTS]: Fire results.".cyan);
+        } else if (dataType[0] === "CANNON/DEBUG") {
+          console.log("[DEBUG]: ", dataType[1].yellow);
         }
 
       });
@@ -93,7 +95,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('SCALE/SAVE', function(scaleData) {
-    logger.log("NORMAL",'Printing CSV:');
+    console.log('[SERVER]: Printing CSV:');
   
     var csvString = json2csv(
       {
@@ -105,13 +107,13 @@ io.on('connection', (socket) => {
     csvString = csvString.replace(']','');
     fs.writeFile("./Data/Scale/" + scaleData.name + ".csv", csvString, function(err) {
       if (err) throw err;
-      logger.log("SUCCESS",'file saved.');
+      console.log('[SERVER]: File saved.');
     });
   });
 
   socket.on('CANNON/FIRE', function(data) {
-    logger.log("NORMAL","Firing cannon.");
-    //logger.log(data.pressure);
+    console.log("Firing cannon.");
+    //console.log(data.pressure);
     serialPort.write("CANNON/FIRE:" + data.pressure);
   });
 
@@ -122,7 +124,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', function(){
-    logger.log("ERROR", 'user disconnected');
+    console.log('[SERVER]: User disconnected'.red);
     serialPort = null;
   });
 });
