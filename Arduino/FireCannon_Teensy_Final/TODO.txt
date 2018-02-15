@@ -1,1 +1,2 @@
  - Change the checkPressure function to instead map from the globalpsi value rather than directly from the value sent to the DAC
+ - change anywhere with "expected feedback" to a map consistent with readings given back from the propreg for PSI on output
