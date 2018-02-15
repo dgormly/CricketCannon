@@ -9,8 +9,11 @@
     width: 70px;
   }
   
-  .data {
-      
+  chart {
+    width: 500px !important;
+    height: 250px !important;
+    float: left; 
+    margin: 16px;   
   }
 
   .floating-box {
