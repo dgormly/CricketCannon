@@ -15,8 +15,8 @@ export class FireComponent implements OnInit {
   toggled = false;
   checked = false;
 
-  balls: number = 1;
-  shots: number = 1;
+  balls: number = 0;
+  shots: number = 0;
   currentShotNum = 0;
   totalShots = 0;
   pressure: number = 0;
@@ -65,24 +65,6 @@ export class FireComponent implements OnInit {
 
     this.totalShots = this.balls * this.shots;
     this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
-
-    // async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
-    //   if (!this.toggled) return;
-    //   this.fireService.fireCannon( this.pressure, this.ballNames[key % this.ballNames.length]).subscribe(() => {
-    //     console.log(key);
-    //     this.currentShotNum++;
-    //     setTimeout(function() {
-    //       next();
-    //     }, 1000)
-    //   })   /* <---- critical piece.  This is how the forEach knows to continue to
-    //                        the next loop.  Must be called inside search's callback so that
-    //                        it   doesn't loop prematurely.*/
-    // }, (err) => {
-    //   if (err) throw err;
-    //   console.log('Session Finished');
-    //   this.toggleOff();
-    //   this.changeStep(4);  
-    // });
   }
 
   toggleOff() {
