@@ -225,8 +225,12 @@ void fireSequence(float pressure) {
   fire();
   if(communicationsIncoming())
     break;
-  PressureToReg(
+  ValueToReg(mapToReg(pressure));
+  //check lasers
+  //confirm ball back in hopper
+  //send results
 }
+
 
 void handleContact() {
   // If we get a valid byte, read analog ins:
@@ -247,10 +251,9 @@ void handleContact() {
         }
       } else if(line == "TEST") {
         testpropreg();
-      }
-    
-    } else if(line == "STOP") {
+      } else if(line == "STOP") {
       depressurise();
+      } 
     } else if(line == "TESTSERVOS") {
       testservos();
     } else if(line == "SERVO") {
@@ -269,6 +272,7 @@ void handleContact() {
     }
   }
 }
+
 float globalpsi = 0;
 
 void testpropreg() {
@@ -382,7 +386,7 @@ void depressurise() {
   }
 }
 
-void pressureToReg(int valtodac) {
+void ValueToReg(int valtodac) {
   if(DEBUG)
     Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
@@ -424,7 +428,7 @@ int mapToReg(float psi) {
  */
 void PressuriseAndWait(float psi){
   globalpsi = psi;
-  pressureToReg(mapToReg(psi));
+  ValueToReg(mapToReg(psi));
   int pressurestatus = checkPressure(mapToReg(psi));
   if( pressurestatus == 2) {
     return 2;
