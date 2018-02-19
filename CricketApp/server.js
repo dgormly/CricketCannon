@@ -10,7 +10,8 @@ const json2csv = require("json2csv");
 const fs = require("fs");
 const colors = require("colors");
 
-//const sqlite3 = require("sqlite3");
+const sqlite3 = require("sqlite3");
+module.exports.db = require("./server/db");
 
 // let db = new sqlite3.Database('./Data/database.db', sqlite3.OPEN_READWRITE, (err) => {
 //   if (err) {
@@ -82,6 +83,8 @@ io.on('connection', (socket) => {
 
         if (dataType[0] === "CANNON/RESULTS") {
           console.log("[RESULTS]: Fire results.".cyan);
+          db.addShot(dataType[1]);
+          console.log("[DATABASE]: Shot data added to the database.".blue);
         } else if (dataType[0] === "CANNON/DEBUG") {
           console.log("[DEBUG]: ", dataType[1].yellow);
         }
