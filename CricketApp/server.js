@@ -63,6 +63,8 @@ io.on('connection', (socket) => {
     });
   });
 
+
+  var currentBallId = -1;
   socket.on('PORT/SET', function(data) {
     let parser = new Readline();
     console.log("[SERVER]: Setting up scale comm");
@@ -75,6 +77,7 @@ io.on('connection', (socket) => {
         }
       });
       
+
       serialPort.pipe(parser);
       parser.on("data", function(data) {
         let dataType = data.split(":");
@@ -83,6 +86,7 @@ io.on('connection', (socket) => {
 
         if (dataType[0] === "CANNON/RESULTS") {
           console.log("[RESULTS]: Fire results.".cyan);
+          dataType[1].Ballid = currentBallId;
           db.addShot(dataType[1]);
           console.log("[DATABASE]: Shot data added to the database.".blue);
         } else if (dataType[0] === "CANNON/DEBUG") {
@@ -115,7 +119,8 @@ io.on('connection', (socket) => {
   });
 
   socket.on('CANNON/FIRE', function(data) {
-    console.log("Firing cannon.");
+    currentBallId = data.Ballid;
+    console.log("Firing cannon with ball: ", data.Ballid);
     //console.log(data.pressure);
     serialPort.write("CANNON/FIRE:" + data.pressure);
   });

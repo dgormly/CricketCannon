@@ -232,7 +232,7 @@ void fireSequence(float pressure) {
   ValueToReg(floatMapToReg(pressure));
   //check lasers
   //confirm ball back in hopper
-  Serial.printf("CANNON/RESULTS:{'PRESSURE':%3.2f, VELOCITY}\n",floatMapToComputer(analogRead(PROP_FEEDBACK)));
+  Serial.printf("CANNON/RESULTS:{'Ballid': -1 ,'Pressure':%3.2f, 'Vin': -1, 'Vout': -1}\n",floatMapToComputer(analogRead(PROP_FEEDBACK)));
 }
 
 

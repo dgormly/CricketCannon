@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Home: {{ status }}</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <h2 padding>Pressure: {{ pressure }}</h2>
+  <ion-list style="margin: 16px;">
+    <ion-item>
+      <ion-label stacked># Balls</ion-label>
+      <ion-input [(ngModel)]="balls" type="number"></ion-input>
+    </ion-item>
+  
+    <ion-item>
+      <ion-label stacked># Shots</ion-label>
+      <ion-input [(ngModel)]="shots" type="number"></ion-input>
+    </ion-item>
+  </ion-list>
+  <ion-list> 
+    <button ion-item *ngFor="let device of devices" (click)="deviceSelected(device)">
+      <h2>{{device.name || 'Unnamed' }}</h2>
+      <p>{{device.id}}</p>
+      <p>RSSI: {{device.rssi}}</p>
+    </button>  
+   </ion-list> 
+  <button padding ion-button (click)="connect()" color="secondary" round style="width: 90%; left: 16px; right: 16px;">Connect</button>
+  <button padding ion-button large color="danger" style="position: absolute; bottom: 16px; width: 90%; left: 16px; right: 16px;">Fire</button>
+</ion-content>

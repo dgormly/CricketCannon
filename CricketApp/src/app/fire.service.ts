@@ -96,7 +96,7 @@ export class FireService {
   fireCannon(pressureValue: number, ballName: string): void {
     this.socket.emit('CANNON/FIRE', {
       pressure: pressureValue,
-      ball: ballName
+      Ballid: ballName
     });
   }
 
