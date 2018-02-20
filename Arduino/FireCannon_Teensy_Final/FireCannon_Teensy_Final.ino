@@ -453,7 +453,7 @@ int floatMapToReg(float psi) {
 
 float floatMapToComputer(int adcval) {
   //ADC val back to bar, then taken back to PSI
-  return (floatMap(adcval, 0 ,  ADCRES,1.5 ,7)) * 14.5038;
+  return (floatMap(adcval, 0 , pow(2,ADCRES),1.5 ,7)) * 14.5038;
 }
 
 /*
