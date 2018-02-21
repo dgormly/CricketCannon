@@ -91,7 +91,7 @@ void loop()
     Serial.println(velocityoutput);
     hasvelocitycaptured = 0;
   }
-  //printpressurecycle();
+  printpressurecycle();
   if(state_error) {
     Serial.printf("Error in state %d\n", state_error);
     state_error = 0;
@@ -218,10 +218,14 @@ void reload_ball(void) {
   frontservo.write(175);
 }
 
+bool ball_has_reloaded = false;
 void fireSequence(float pressure) {
   float velocity = 0;
-  reload_ball();
+  if(!ball_has_reloaded) {
+    reload_ball();
+  }
   delay(150); //to ensure ball drops in before a shot is fired assuming that the pressure is already at max
+  ball_has_reloaded = true;
   if(communicationsIncoming())
     return;
   int pressurestatus = PressuriseAndWait(pressure);
@@ -229,6 +233,7 @@ void fireSequence(float pressure) {
     return; //comms incoming for 2, error for 0. either way want to exit
   }
   fire();
+  ball_has_reloaded = false;
   if(communicationsIncoming())
     return;
   ValueToReg(floatMapToReg(pressure)); //repressurise
