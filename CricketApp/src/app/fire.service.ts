@@ -26,6 +26,11 @@ export class FireService {
   scaleData = this.cScale.asObservable();
   socket;
 
+  dashCurrentShot = 0;
+  totalShots = 0;
+  ballName = "";
+
+
   private currentPressure = new BehaviorSubject<number>(0);
   currentPressure$ = this.currentPressure.asObservable();
 
@@ -66,7 +71,10 @@ export class FireService {
 
     this.socket.on('CANNON/RESULTS', function(data) {
       console.log("Cannon results - client");
-      that.cannonResults.next(data);
+      that.cannonResults.next(data.results);
+      that.dashCurrentShot++;
+      that.ballName = data.ballName;
+      that.totalShots;
     });
 
     this.socket.on('SCALE/ERROR', function(data) {
@@ -93,11 +101,10 @@ export class FireService {
   }
 
 
-  fireCannon(pressureValue: number, ballName: string): void {
-    this.socket.emit('CANNON/FIRE', {
-      pressure: pressureValue,
-      ball: ballName
-    });
+
+  fireCannon(payload: any): void {
+    this.socket.emit('CANNON/SET', payload);
+    this.socket.emit('CANNON/FIRE', payload.pressure);
   }
 
   stopCannon(): void {
@@ -143,8 +150,7 @@ export class FireService {
   saveCannonData(fileName: string): void {
     this.socket.emit('CANNON/SAVE', {
       name: fileName,
-      headers:  ['ball', 'rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"],
-      data: this.cScale.getValue()
+      headers:  ['ballid', 'pressure']
     });
   }
 

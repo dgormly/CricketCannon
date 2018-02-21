@@ -42,29 +42,43 @@ export class FireComponent implements OnInit {
 
     var that = this;
     this.fireService.cannonResults$.subscribe( data => {
-      that.currentShotNum++;
-      if (that.currentShotNum < that.totalShots) {
-        that.fire(that.pressure);
-      } else {
+      if (that.fireService.dashCurrentShot >= that.fireService.totalShots) {
         this.toggleOff();
+        this.fireService.stopCannon();
+        //this.changeStep(5);
       }
-    });
-  
+    }); 
   }
 
-  beginFiring(pressure: number): void {
+
+  reset(): void {
+    this.fireService.totalShots = 0;
+    this.fireService.dashCurrentShot = 0;
+    this.fireService.ballName = "";
+    this.fireService.stopCannon();
+  }
+
+
+  beginFiring(): void {
     this.toggled = true;
-    this.fire(pressure);
+    this.fire();
   }
 
-  fire(pressure: number): void {
+  fire(): void {
     console.log("Firing!");
     if (!this.toggled) {
       return;
     }
 
     this.totalShots = this.balls * this.shots;
-    this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
+    var payload = {
+      ballNames: this.ballNames,
+      totalShots: this.totalShots,
+      pressure: this.pressure,
+      currentShot: this.currentShotNum
+    }
+
+    this.fireService.fireCannon(payload);
   }
 
   toggleOff() {
@@ -73,11 +87,6 @@ export class FireComponent implements OnInit {
     console.log("Finished firing session.");
   }
 
-  sleep(ms){
-    return new Promise(resolve=>{
-        setTimeout(resolve,ms)
-    })
-  }
 
   setBallNum(numBrands: number) {
     console.log('number: ', this.ballNames);

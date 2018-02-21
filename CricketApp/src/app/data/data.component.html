@@ -11,15 +11,15 @@
           The actual rendered columns are set as a property on the row definition" -->
 
     <!-- Id Column -->
-    <ng-container matColumnDef="id">
-      <mat-header-cell *matHeaderCellDef> id </mat-header-cell>
-      <mat-cell *matCellDef="let shot"> {{shot.id}} </mat-cell>
+    <ng-container matColumnDef="ballid">
+      <mat-header-cell *matHeaderCellDef> Ball ID </mat-header-cell>
+      <mat-cell *matCellDef="let shot"> {{ shot.ballid }} </mat-cell>
     </ng-container>
 
     <!-- Name Column -->
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-      <mat-cell *matCellDef="let shot"> {{shot.name}} </mat-cell>
+    <ng-container matColumnDef="pressure">
+      <mat-header-cell *matHeaderCellDef> Pressure </mat-header-cell>
+      <mat-cell *matCellDef="let shot"> {{ shot.pressure }} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

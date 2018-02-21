@@ -12,13 +12,6 @@ const colors = require("colors");
 
 //const sqlite3 = require("sqlite3");
 
-// let db = new sqlite3.Database('./Data/database.db', sqlite3.OPEN_READWRITE, (err) => {
-//   if (err) {
-//     console.error(err.message);
-//   }
-//   console.log("Connected to the database.")
-// });
-
 var serialPort;
 
 // Parsers
@@ -49,6 +42,12 @@ server.listen(port, () => {
 
 
 // Socket setup
+var totalShots = 0;
+var currentShot = 0;
+var pressure = 0.0;
+var ballNames;
+var shotRecord = [""];
+
 console.log("[SERVER]: Setting up sockets.");
 const io = module.exports.io = socketIo(server);
 var that = this;
@@ -62,9 +61,12 @@ io.on('connection', (socket) => {
     });
   });
 
+  /**
+   * Set port to use for communication.
+   */
   socket.on('PORT/SET', function(data) {
     let parser = new Readline();
-    console.log("[SERVER]: Setting up scale comm");
+    console.log("[SERVER]: Setting up comm with baud ", data.baud);
       serialPort = new SerialPort(data.port, {
         baudRate: data.baud
       }, function(err) {
@@ -82,6 +84,18 @@ io.on('connection', (socket) => {
 
         if (dataType[0] === "CANNON/RESULTS") {
           console.log("[RESULTS]: Fire results.".cyan);
+          shotRecord.push({
+            ballid: ballNames[currentShot % ballNames.length],
+            pressure: dataType[1].pressure
+          });
+          //TODO: Add to database : Ball ID, Pressure
+          currentShot++;
+          if (currentShot < totalShots) {
+            serialPort.write("CANNON/FIRE:" + data.pressure);
+          } else {
+            console.log("[SERVER]: Stopping cannon".red);
+            serialPort.write("CANNON/STOP:");
+          }
         } else if (dataType[0] === "CANNON/DEBUG") {
           console.log("[DEBUG]: ", dataType[1].yellow);
         }
@@ -90,10 +104,17 @@ io.on('connection', (socket) => {
   });
 
 
+  /**
+   * Reset 3pt. scale.
+   */
   socket.on('SCALE/TARE', function(data) {
-    serialPort.write('t');;
+    serialPort.write('t');
   });
 
+
+  /**
+   * Save Scale data to csv.
+   */
   socket.on('SCALE/SAVE', function(scaleData) {
     console.log('[SERVER]: Printing CSV:');
   
@@ -111,18 +132,63 @@ io.on('connection', (socket) => {
     });
   });
 
+
+  /**
+   * Set cannon settings on the server.
+   * 
+   * data holds ballNames, totalShots, pressure, and currentShot
+   */
+  socket.on('CANNON/SET', function(data) {
+    console.log("[CANNON]: Setting cannon settings.".green);
+    ballNames = data.ballNames;
+    totalShots = data.totalShots;
+    pressure = data.pressure;
+    currentShot = data.currentShot;
+    console.log("[DEBUG]: Cannon settings: ".yellow, data);
+  });
+
+
+  /**
+   * Fire Cannon
+   */
   socket.on('CANNON/FIRE', function(data) {
-    console.log("Firing cannon.");
+    console.log("[SERVER]: Firing cannon.");
     //console.log(data.pressure);
     serialPort.write("CANNON/FIRE:" + data.pressure);
   });
 
+
+  /**
+   * Stop Cannon.
+   */
   socket.on('CANNON/STOP', function() {
     if (serialPort) {
-    serialPort.write("CANNON/STOP:");
+      serialPort.write("CANNON/STOP:");
+      console.log("[SERVER]: Stopping cannon.".red);
     }
   });
 
+  /**
+   * Save cannon data to CSV.
+   */
+  socket.on('CANNON/SAVE', function(data) {
+    var csvString = json2csv(
+      {
+        data: shotRecord,
+        fields: data.headers
+    });
+    csvString = csvString.replace('[','');
+    csvString = csvString.replace(']','');
+    fs.writeFile("./Data/Cannon/" + data.name + ".csv", csvString, function(err) {
+      if (err) throw err;
+      console.log('[SERVER]: File saved.');
+    });
+  });
+
+
+  /**
+   * Client disconnects from port and clears serial com.
+   */
   socket.on('disconnect', function(){
     console.log('[SERVER]: User disconnected'.red);
     serialPort = null;

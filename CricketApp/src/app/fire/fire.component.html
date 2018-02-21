@@ -7,15 +7,15 @@
         <mat-panel-title>
           Cannon Wizard
         </mat-panel-title>
-        <mat-panel-description *ngIf="currentShotNum > 0">
-          Next: {{ ballNames[currentShotNum % ballNames.length] }}
+        <mat-panel-description *ngIf="fireService.dashCurrentShot > 0">
+          Next: {{ fireService.dashCurrentShot }}
           <mat-progress-bar
           color="warn"
           mode="determinate"
-          [value]="(currentShotNum / (balls * shots)) * 100"
+          [value]="(fireService.dashCurrentShot / fireService.totalShots)"
           class="progress">
         </mat-progress-bar>
-          {{ (shots * balls - currentShotNum)}}
+          {{ fireService.totalShots - fireService.dashCurrentShot }}
         </mat-panel-description>
       </mat-expansion-panel-header>
             <mat-horizontal-stepper [linear]="false" #stepper>
@@ -95,7 +95,7 @@
                     <br/>
                     <button mat-raised-button
                     [disabled]="toggled"
-                    (click)="beginFiring(pressure)"
+                    (click)="beginFiring()"
                     color="primary"
                     class="fire-form"  >
               Start
