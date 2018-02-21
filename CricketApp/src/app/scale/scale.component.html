@@ -1,56 +1,75 @@
-<mat-card id="card-form">
-      <mat-card-header>
-        <mat-card-title>
-        Three-Point Scale
-      </mat-card-title>
-        <mat-card-subtitle>
-            Ball measurement tool
-        </mat-card-subtitle>
-      </mat-card-header>
-      <mat-card-content>
-          <div class="floating-box">
-          <mat-form-field>
-              <mat-select placeholder="Comm Port" [(value)]="selectedPort" (click)="getPorts()" (change)="fireService.setScalePort(selectedPort)">
-                <div *ngIf="portNames">
-                  <mat-option *ngFor="let port of portNames" [value]="port.comName">
-                    {{ port.comName }}
-                  </mat-option>
-              </div>
-              </mat-select>
-            </mat-form-field>
-          </div>
-        <div>
-          Sample Count: {{ count }} <br />
-          Raw: A:{{ rw1[count-1] }} B:{{ rw2[count-1]  }} C:{{ rw3[count-1]  }} <br />
-          Sum: {{ sum[count-1]  }} <br />
-          W1: X: {{ w1x[count-1]  }} Y: {{ w1y[count-1]  }} <br />
-          W2: X: {{ w2x[count-1]  }} Y: {{ w2y[count-1]  }} <br />
-          W3: X: {{ w3x[count-1]  }} Y: {{ w3y[count-1]  }} <br />
-          dX: {{ deltaX[count-1]  }} <br />
-          dY: {{ deltaY[count-1]  }} <br />
-          distX: {{ distX[count-1]  }} <br />
-          distY: {{ distY[count-1]  }} <br />
-        </div>
-  </mat-card-content>
-    <mat-card-actions>
-      <button mat-raised-button
-        color="primary"
-        (click)="tare()">
-          Tare
-      </button>
-      <button mat-raised-button
-      color="warn"
-      (click)="displaySample()">
-        Sample
-    </button>
-    <mat-form-field>
-        <mat-label>File Name</mat-label>
-        <input matInput name="fileNameInput" [(ngModel)]="fileName" placeholder="File name">
+
+<div style="margin: auto; overflow: hidden; width: 1200px;">
+  <mat-card id="card-form" style="float: left; height: 250px; width: 200px; margin: 16px;">
+    <mat-card-header>
+      <mat-card-title>
+      Three-Point Scale
+    </mat-card-title>
+      <mat-card-subtitle>
+          Ball measurement tool
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-form-field>
+        <mat-select placeholder="Comm Port" [(value)]="fireService.selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(fireService.selectedPort, 115200)">
+            <mat-option *ngFor="let port of fireService.ports" [value]="port.comName">
+              {{ port.comName }}
+            </mat-option>
+        </mat-select>
       </mat-form-field>
-      <button mat-raised-button
-              color="accent"
-              (click)="saveScaleData()">
-        Export
-      </button>
-    </mat-card-actions>
+          <br />
+          <mat-form-field>
+          <mat-label>Ball Name</mat-label>
+          <input matInput name="ballNameInput" [(ngModel)]="ballName" placeholder="Ball name">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>File Name</mat-label>
+          <input matInput name="fileNameInput" [(ngModel)]="fileName" placeholder="File name">
+        </mat-form-field><br />
+        <mat-card-actions style="margin: 0 auto;">
+          <button mat-raised-button
+            color="primary"
+            (click)="tare()" [disabled]="fireService.selectedPort == ''">
+              Tare
+          </button>
+          <button mat-raised-button 
+          [disabled]="fileName == '' || fireService.selectedPort == '' || ballName == ''"
+          color="accent"
+          (click)="saveScaleData()">
+          Save
+          </button>  
+        </mat-card-actions>
+  </mat-card-content>
   </mat-card>
+  
+  <mat-card id="card-form" style="float: left; height: 250px; margin: 16px; width: 200px;">
+    <mat-card-header>
+      <mat-card-title>
+      Data
+    </mat-card-title>
+      <mat-card-subtitle>
+          Ball weight data
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      Raw: A:{{ rw1[count-1] }} B:{{ rw2[count-1]  }} C:{{ rw3[count-1]  }} <br />
+      Sum: {{ sum[count-1]  }} <br />
+      W1: X: {{ w1x[count-1]  }} Y: {{ w1y[count-1]  }} <br />
+      W2: X: {{ w2x[count-1]  }} Y: {{ w2y[count-1]  }} <br />
+      W3: X: {{ w3x[count-1]  }} Y: {{ w3y[count-1]  }} <br />
+      dX: {{ deltaX[count-1]  }} <br />
+      dY: {{ deltaY[count-1]  }} <br />
+      distX: {{ distX[count-1]  }} <br />
+      distY: {{ distY[count-1]  }} <br />
+      <mat-card-actions>
+        <button mat-raised-button
+        color="warn"
+        (click)="displaySample(ballName)"
+        [disabled]="fireService.selectedPort == '' || ballName == ''">
+          Sample
+      </button>
+      </mat-card-actions>
+  </mat-card-content>
+  </mat-card>
+      <chart #balanceChart [type]="type" [data]="data" [options]="options"></chart>
+  </div>

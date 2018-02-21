@@ -1,9 +1,6 @@
-import {Component, Input, OnInit, Output, ViewChild} from '@angular/core';
-import {FireService} from '../fire.service';
-import {Response} from '../Response';
+import {Component, Input, OnInit, Output, ViewChild, ChangeDetectorRef} from '@angular/core';
+import { FireService } from '../fire.service';
 import { FormGroup, Validators, FormBuilder } from '@angular/forms';
-import * as async from 'async';
-import { nextTick } from 'async';
 
 
 @Component({
@@ -16,24 +13,22 @@ export class FireComponent implements OnInit {
   @ViewChild('stepper') stepper;
 
   toggled = false;
-  portNames: Response[] = [];
-  selectedPort: string;
   checked = false;
 
-  balls: number = 1;
-  shots: number = 1;
+  balls: number = 0;
+  shots: number = 0;
   currentShotNum = 0;
-  pressure = 0;
-  ballNames: string[] = ["ball 0"];
-  hasFired: boolean = false;
+  totalShots = 0;
+  pressure: number = 0;
+  ballNames: string[] = ["ball ID"];
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
+  thirdFormGroup: FormGroup;
 
-  constructor(private fireService: FireService, private _formBuilder: FormBuilder) {
-    this.fireService.isFiring(this.toggled);
+  constructor(private fireService: FireService, private _formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
+
   }
-
   ngOnInit() {
     this.firstFormGroup = this._formBuilder.group({
       firstCtrl: ['', Validators.required]
@@ -41,60 +36,41 @@ export class FireComponent implements OnInit {
     this.secondFormGroup = this._formBuilder.group({
       secondCtrl: ['', Validators.required]
     });
-
-    this.getPorts();
-
-    this.fireService.connectSocket();
-  }
-
-  getPorts() {
-    this.fireService.getPorts().subscribe(val => {
-      return this.portNames = val.data
+    this.thirdFormGroup = this._formBuilder.group({
+      thirdCtrl: ['', Validators.required]
     });
+
+    var that = this;
+    this.fireService.cannonResults$.subscribe( data => {
+      that.currentShotNum++;
+      if (that.currentShotNum < that.totalShots) {
+        that.fire(that.pressure);
+      } else {
+        this.toggleOff();
+      }
+    });
+  
   }
 
-  updateSettings(): void {
-    console.log('Port updated');
-    this.fireService.postSettings(this.selectedPort);
-  }
-
-  clear(): void {
-    this.fireService.clearShots();
+  beginFiring(pressure: number): void {
+    this.toggled = true;
+    this.fire(pressure);
   }
 
   fire(pressure: number): void {
-    var count = 0;
-    this.toggled = !this.toggled;
-    console.log('Firing!');
-    console.log(this.balls);
-    this.fireService.isFiring(this.toggled);
+    console.log("Firing!");
+    if (!this.toggled) {
+      return;
+    }
 
-    async.eachSeries([...Array(this.shots * this.balls - this.currentShotNum)].keys(), (key, next) => {
-      if (!this.toggled) return;
-      this.fireService.fireCannon( this.pressure, this.ballNames[key % this.ballNames.length]).subscribe(() => {
-        console.log(key);
-        this.currentShotNum++;
-        setTimeout(function() {
-          next();
-        }, 1000)
-      })   /* <---- critical piece.  This is how the forEach knows to continue to
-                           the next loop.  Must be called inside search's callback so that
-                           it   doesn't loop prematurely.*/
-    }, (err) => {
-      if (err) throw err;
-      console.log('Session Finished');
-      this.toggleOff();
-      this.changeStep(4);
-    });
-  }
-
-  saveToCsv(location: string): void {
-    this.fireService.saveFile(location);
+    this.totalShots = this.balls * this.shots;
+    this.fireService.fireCannon(pressure, this.ballNames[this.currentShotNum % this.balls]);
   }
 
   toggleOff() {
     this.toggled = false;
-    this.fireService.isFiring(this.toggled);
+    this.fireService.stopCannon();
+    console.log("Finished firing session.");
   }
 
   sleep(ms){
@@ -105,8 +81,9 @@ export class FireComponent implements OnInit {
 
   setBallNum(numBrands: number) {
     console.log('number: ', this.ballNames);
-    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball " + i);
+    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball ID");
     console.log(this.ballNames);
+    this.cdr.detectChanges();
   }
 
   /**

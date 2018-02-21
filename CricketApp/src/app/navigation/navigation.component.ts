@@ -13,14 +13,13 @@ export class NavigationComponent implements OnInit {
   pressureValue;
 
   constructor(private fireService: FireService) {
-      fireService.firingMessage.subscribe(toggled => {
-        this.toggled = toggled;
-        console.log(this.toggled);
-      });
+
    }
 
   ngOnInit() {
-    this.pressureValue = this.fireService.currentPressure;
+     this.fireService.currentPressure$.subscribe(data => {
+       this.pressureValue = data;
+     })
   }
 
 }

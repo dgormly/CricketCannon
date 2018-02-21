@@ -9,6 +9,13 @@
     width: 70px;
   }
   
+  chart {
+    width: 500px !important;
+    height: 250px !important;
+    float: left; 
+    margin: 16px;   
+  }
+
   .floating-box {
     display: inline-block;
     width:fit-content;

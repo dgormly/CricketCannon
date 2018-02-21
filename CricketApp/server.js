@@ -1,17 +1,25 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const path = require('path');
-module.exports.http = require('http');
+const express = require("express");
+const bodyParser = require("body-parser");
+const path = require("path");
+const http = require("http");
 const app = module.exports.app = express();
-const SerialPort = require('serialport');
+const SerialPort = require("serialport");
 const Readline = SerialPort.parsers.Readline;
-// API file for interacting with MongoDB
-const api = require('./server/routes/api');
-const socketIo = require('socket.io');
-const json2csv = require('json2csv');
-const fs = require('fs');
+const socketIo = require("socket.io");
+const json2csv = require("json2csv");
+const fs = require("fs");
+const colors = require("colors");
 
-var scalePort;
+//const sqlite3 = require("sqlite3");
+
+// let db = new sqlite3.Database('./Data/database.db', sqlite3.OPEN_READWRITE, (err) => {
+//   if (err) {
+//     console.error(err.message);
+//   }
+//   console.log("Connected to the database.")
+// });
+
+var serialPort;
 
 // Parsers
 app.use(bodyParser.json());
@@ -21,64 +29,73 @@ app.use(bodyParser.urlencoded({ extended: false}));
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // API location
-app.use('/api', api);
-
 // Send all other requests to the Angular app
 app.get('*', (req, res) => {
-  console.log("connection detected");
+  console.log("[SERVER]: Connection detected".green);
   res.sendFile(path.join(__dirname, './dist/index.html'));
 });
 
-console.log("Starting server up.");
+console.log("[SERVER]: Starting server up.");
 //Set Port
 const port = '5000';
 app.set('port', port);
-console.log("Successfully setup port");
+console.log("[SERVER]: Successfully setup port".green);
 
-const server = module.exports.server = module.exports.http.createServer(app);
+const server = http.createServer(app);
 
 server.listen(port, () => {
-  console.log(`Running on localhost:${port}`)
+  console.log(`[SERVER]: Running on localhost:${port}`)
 });
 
 
 // Socket setup
-console.log("Setting up sockets.");
+console.log("[SERVER]: Setting up sockets.");
 const io = module.exports.io = socketIo(server);
+var that = this;
 io.on('connection', (socket) => {
-  console.log('The client connected');
+  console.log('[SERVER]: The client connected'.green);
   module.exports.client = socket;
 
-  socket.on('PORTS', function() {
+  socket.on('PORT/GET', function() {
     SerialPort.list(function (err, ports) {
-      console.log(ports);
-      socket.emit("PORTS", ports);
+      socket.emit("PORT/GET", ports);
     });
   });
 
-  socket.on('SPORTS', function(data) {
-    console.log("Setting up scale comm");
-    
-    scalePort = new SerialPort(data.toString(), {
-      baudRate: 115200
-    })
-    
-    var parser = new Readline();
-    scalePort.pipe(parser);
-    
-    parser.on("data", function(data) {
-      let dataType = data.split("!");
-      //console.log(dataType);
-      io.emit(dataType[0], dataType[1]);
-    })
+  socket.on('PORT/SET', function(data) {
+    let parser = new Readline();
+    console.log("[SERVER]: Setting up scale comm");
+      serialPort = new SerialPort(data.port, {
+        baudRate: data.baud
+      }, function(err) {
+        if (err) {
+          socket.emit('PORT/ERROR', 'Error on connecting to port.');
+          return console.log(colors.red('[SERVER]: Error on connecting to port: ', err.message));
+        }
+      });
+      
+      serialPort.pipe(parser);
+      parser.on("data", function(data) {
+        let dataType = data.split(":");
+//        console.log("DEBUG",dataType[0].trim());
+        io.sockets.emit(dataType[0].trim(), dataType[1]);
+
+        if (dataType[0] === "CANNON/RESULTS") {
+          console.log("[RESULTS]: Fire results.".cyan);
+        } else if (dataType[0] === "CANNON/DEBUG") {
+          console.log("[DEBUG]: ", dataType[1].yellow);
+        }
+
+      });
   });
 
-  socket.on('TARE', function(data) {
-    scalePort.write('t');
+
+  socket.on('SCALE/TARE', function(data) {
+    serialPort.write('t');;
   });
 
-  socket.on('SAVESCALE', function(scaleData) {
-    console.log('Printing CSV:');
+  socket.on('SCALE/SAVE', function(scaleData) {
+    console.log('[SERVER]: Printing CSV:');
   
     var csvString = json2csv(
       {
@@ -88,50 +105,26 @@ io.on('connection', (socket) => {
     csvString = csvString.replace('[','');
     
     csvString = csvString.replace(']','');
-    fs.writeFile("./../data/Scale/" + scaleData.name + ".csv", csvString, function(err) {
+    fs.writeFile("./Data/Scale/" + scaleData.name + ".csv", csvString, function(err) {
       if (err) throw err;
-      console.log('file saved.');
+      console.log('[SERVER]: File saved.');
     });
-  })
+  });
+
+  socket.on('CANNON/FIRE', function(data) {
+    console.log("Firing cannon.");
+    //console.log(data.pressure);
+    serialPort.write("CANNON/FIRE:" + data.pressure);
+  });
+
+  socket.on('CANNON/STOP', function() {
+    if (serialPort) {
+    serialPort.write("CANNON/STOP:");
+    }
+  });
 
   socket.on('disconnect', function(){
-    console.log('user disconnected');
-    scalePort = null;
+    console.log('[SERVER]: User disconnected'.red);
+    serialPort = null;
   });
 });
-
-
-// 3pt scale socket
-// var scale = io.of('/3pt');
- module.exports.io = io;
-// scale.on('connection', function(socket) {
-//   console.log(console.log("Java client connected."));
-
-//   socket.on("PORT", function(data) {
-//     port = new SerialPort(data, {
-//       baudRate: 115200
-//     });
-//     console.log("New com set");
-//     socket.emit("SUCCESS", "OK");
-//   });
-
-//   socket.on('disconnect', function(){
-//     console.log('3pt disconnected');
-//   });
-// });
-
-
-
-// Testing
-// scalePort = new SerialPort("COM10", {
-//   baudRate: 115200
-// });
-
-// var parser = new Readline();
-// scalePort.pipe(parser);
-
-// parser.on("data", function(data) {
-//   let dataType = data.split("!");
-//   //console.log(dataType);
-//   io.emit(dataType[0], dataType[1]);
-// });

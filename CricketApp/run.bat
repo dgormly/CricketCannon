@@ -1,2 +1,1 @@
-SETCONSOLE /minimize
 npm start

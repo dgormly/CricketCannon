@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import {Observable} from 'rxjs/Observable';
 import {Shot, Scale } from './Shot';
-import {Response} from './Response';
 import {HttpClient, HttpHeaders} from '@angular/common/http';
 import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {tap} from 'rxjs/operators';
-import {SHOTS} from './mock-shots';
 import { Subject } from 'rxjs/Subject';
 import * as socketIo from 'socket.io-client';
 
@@ -13,51 +11,47 @@ import * as socketIo from 'socket.io-client';
 @Injectable()
 export class FireService {
 
-  private serialPortUrl = '/api/ports';
-  private ports: any;
-  shots = new BehaviorSubject<Shot[]>(SHOTS);
+  ports: any = [];
+  selectedPort: any;
+  private cannonResults = new BehaviorSubject<string>("");
+  cannonResults$ = this.cannonResults.asObservable();
+
+  shots = new BehaviorSubject<Shot[]>([]);
   private firingSubject = new BehaviorSubject<boolean>(false);
-  firingMessage = this.firingSubject.asObservable();
+  private firingMessage = this.firingSubject.asObservable();
   shotData = this.shots.asObservable();
   private cShots = new BehaviorSubject<Shot[]>([]);
   currentShots = this.cShots.asObservable();
-  private cScale = new BehaviorSubject<Scale[]>([]);
+  cScale = new BehaviorSubject<Scale[]>([]);
   scaleData = this.cScale.asObservable();
-  private socket;
-  currentPressure;
+  socket;
+
+  private currentPressure = new BehaviorSubject<number>(0);
+  currentPressure$ = this.currentPressure.asObservable();
+
   scaleDataSubject = new BehaviorSubject<String>("");
   tareSubject = new BehaviorSubject<Boolean>(false);
 
-  private httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json'})
-  };
-
-  constructor(private http: HttpClient) {
-  }
-
-  connectSocket(): void {
+  constructor() {
     var that = this;
     this.socket = socketIo('http://localhost:5000');
-    this.socket.on('RESULT', function(data) {
-      console.log("Client rec data:");
-      var message = data.toString();
-      console.log(message);
-      //this.currentPressure = data;
-    });
 
-
-    this.socket.on('SCALE', function(data) {
+    this.socket.on('SCALE/DATA', function(data) {
       let message = data.toString();
       that.scaleDataSubject.next(message);
     });
 
-    this.socket.on('PORTS', function(data) {
-      console.log(data.toString());
-      this.ports = data;
+    this.socket.on('PORT/GET', function(data) {
+      that.ports = data;
+      console.log('Ports setup');
+    });
+
+    this.socket.on('CANNON/PRESSURE', function(data) {
+      that.currentPressure.next(data);
     });
 
 
-    this.socket.on('SPORTS', function(data) {
+    this.socket.on('PORT/SET', function(data) {
       if (data.toString() === "OK") {
         console.log("Successfully connected scale comms");
       } else {
@@ -65,57 +59,53 @@ export class FireService {
       }
     });
 
-    this.socket.on('TARE', function(data) {
+    this.socket.on('SCALE/TARE', function(data) {
       console.log("Tare complete!");
       that.tareSubject.next(true);
-    })
-  }
+    });
 
-  setScalePort(portName: string) {
-    this.socket.emit('SPORTS', portName);
-  }
+    this.socket.on('CANNON/RESULTS', function(data) {
+      console.log("Cannon results - client");
+      that.cannonResults.next(data);
+    });
 
-  getPorts(): Observable<Response> {
-    return this.http.get<Response>(this.serialPortUrl)
-      .pipe(
-        tap(ports => {
-        console.log(ports);
-        this.ports = ports;
-      }));
-  }
-
-  postSettings(portName: string): void {
-    console.log("performing post.");
-    this.http.post('/api/settings',
-    {
-      port: portName
-    }, this.httpOptions).subscribe();
-  }
-
-  fireCannon(pressureValue: number, ballName: string): Observable<Object> {
-    return this.http.post<Shot>('/api/fire',
-    {
-       pressure: pressureValue
-    }, this.httpOptions)
-    .pipe(tap(data => {
+    this.socket.on('SCALE/ERROR', function(data) {
       console.log(data);
-    }));
+    });
+
+    this.socket.on('PORT/ERROR', function(data) {
+      this.selectedPort = "";
+    });
+
+    this.getPorts();
   }
 
-  isFiring(data: boolean): void{
+
+  setPort(portName: string, baud: number): void {
+    this.socket.emit('PORT/SET', {
+      port: portName,
+      baud: baud
+    });
+  }
+
+  getPorts() {
+    this.socket.emit('PORT/GET');
+  }
+
+
+  fireCannon(pressureValue: number, ballName: string): void {
+    this.socket.emit('CANNON/FIRE', {
+      pressure: pressureValue,
+      ball: ballName
+    });
+  }
+
+  stopCannon(): void {
+    this.socket.emit('CANNON/STOP');
+  }
+
+  isFiring(data: boolean): void {
     this.firingSubject.next(data);
-  }
-
-  saveFile(filePath: string): void {
-    this.http.post<object>('/api/export',
-    {
-      "data": [{
-        "id": "hello",
-        "name": "world"
-      }],
-      "headers": ["id", "name"],
-      "fileName": filePath
-    }, this.httpOptions).subscribe();
   }
 
 
@@ -137,20 +127,28 @@ export class FireService {
     this.cScale.next(this.cScale.getValue().concat(scale));
   }
 
+
   clearScaleData(): void {
     this.cScale.next([]);
   }
 
-  saveScaleData(): void {
-    this.socket.emit('SAVESCALE', {
-      name: "test",
-      headers:  ['rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"],
+  saveScaleData(fileName: string): void {
+    this.socket.emit('SCALE/SAVE', {
+      name: fileName,
+      headers:  ['ball', 'rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"],
       data: this.cScale.getValue()
     });
   }
 
+  saveCannonData(fileName: string): void {
+    this.socket.emit('CANNON/SAVE', {
+      name: fileName,
+      headers:  ['ball', 'rw1', 'rw2', "rw3", "sum", "w1x", "w1y", "w2x", "w2y", "w3x", "w3y", "deltaX", "deltaY", "distX", "distY"],
+      data: this.cScale.getValue()
+    });
+  }
 
   tare(): void {
-    this.socket.emit('TARE');
+    this.socket.emit('SCALE/TARE');
   }
 }

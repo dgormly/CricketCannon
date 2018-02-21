@@ -97,7 +97,7 @@ void loop() {
 
     //Serial.print("n:,");
     //Serial.print(countSum);
-    Serial.print("SCALE!Raw/" +  String(a) + "/" + String(b) + "/" + String(c) 
+    Serial.print("SCALE/DATA:Raw/" +  String(a) + "/" + String(b) + "/" + String(c) 
                 + "/Sum/" + String(sum) 
                 + "/W1/" + String(w1x) + "/" + String(w1y) 
                 + "/W2/" +String(w2x) + "/" + String(w2y) 
@@ -127,7 +127,7 @@ void loop() {
       while (LoadCell_3.getTareStatus()){
         delay(100);        
       }
-      Serial.println("TARE!OK");
+      Serial.println("SCALE/TARE:OK");
     }
   }
 }

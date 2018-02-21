@@ -1,9 +1,16 @@
 export class Shot {
   id: number;
+  shotType: string;
+  shotCount: number;
   name: string;
+  force: number = -1;
+  velocity: number = -1;
+  displacement: number = -1;
+  shotPressure: number;
 }
 
 export class Scale {
+  ball: string;
   rw1: number;
   rw2: number;
   rw3: number;
@@ -18,4 +25,5 @@ export class Scale {
   deltaY: number;
   distX: number;
   distY: number;
+  sampleNo: number;
 }
