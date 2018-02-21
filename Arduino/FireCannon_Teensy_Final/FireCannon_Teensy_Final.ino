@@ -29,7 +29,11 @@ boolean globalstop = false;
 #define SERVOBACK 21
 #define CAMERA A9
 ////////////////////////////////////////////////////
+//Ultrasonic detection variables//////////////////
 
+#define TRIG_PIN A2
+#define ECHO_PIN A1
+/////////////////////////////////////////////////
 //Laser detection variables///////////////////
 volatile long velocitydiff_1 = 0;
 volatile long velocitydiff_2 = 0;
@@ -83,6 +87,31 @@ void setup()
   BLESERIAL.begin(115200);
 }
 
+
+/*returns true if a ball is stucK, else returns false
+ * 
+ */
+bool Ultrasonic_check() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long duration = pulseIn(ECHO_PIN, HIGH, 3000); //3000 is the maximum output for 50cm measurement
+  if(duration == 0) {
+    duration = 3000;  
+  }
+  float distance = duration /29 / 2;
+  if(DEBUG) {
+    Serial.println(distance);
+  }
+  if(distance < 25.0) {
+    return true;
+  }
+  return false;
+}
+
+
 void loop()
 {
   // Wait for response
@@ -109,6 +138,8 @@ void setup_relays() {
   pinMode(DUMP_NO, OUTPUT);
   pinMode(CLICKER, INPUT);
   pinMode(CAMERA, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(TRIG_PIN, OUTPUT);
 }
 
 
@@ -219,6 +250,7 @@ void reload_ball(void) {
 }
 
 bool ball_has_reloaded = false;
+
 void fireSequence(float pressure) {
   float velocity = 0;
   if(!ball_has_reloaded) {
@@ -231,6 +263,10 @@ void fireSequence(float pressure) {
   int pressurestatus = PressuriseAndWait(pressure);
   if(pressurestatus == 2 || pressurestatus == 0) {
     return; //comms incoming for 2, error for 0. either way want to exit
+  }
+  while(Ultrasonic_check()){
+    delay(50);
+    Serial.println("Ball in the way!");
   }
   fire();
   ball_has_reloaded = false;
@@ -396,7 +432,8 @@ void reload() {
   digitalWrite(TANK_NO, LOW);
 }
 
-#define REGTHRESHOLD 100
+#define REGTHRESHOLDTOP 300
+#define REGTHRESHOLDBOTTOM 100
 
 void depressurise() {
   float bar;
@@ -406,7 +443,7 @@ void depressurise() {
     bar = i / 14.5038;
     valtodac = floatMap(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
     analogWrite(A14, valtodac);
-    delay(200);
+    delay(300);
     reg_val = analogRead(PROP_FEEDBACK);
     long expected_feedback = floatMap(valtodac, 0, pow(2, DACRES), 0 , 2800);
     count++;
@@ -436,7 +473,7 @@ int checkPressure(int valtodac) {
     if(communicationsIncoming())
       return 2;
     reg_val = analogRead(PROP_FEEDBACK);
-    if((reg_val >= (expected_feedback - REGTHRESHOLD)) && (reg_val <= (expected_feedback + REGTHRESHOLD))) {
+    if((reg_val >= (expected_feedback - REGTHRESHOLDBOTTOM)) && (reg_val <= (expected_feedback + REGTHRESHOLDTOP))) {
       return 1;
     }
     printpressurecycle();
