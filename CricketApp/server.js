@@ -9,8 +9,7 @@ const socketIo = require("socket.io");
 const json2csv = require("json2csv");
 const fs = require("fs");
 const colors = require("colors");
-
-//const sqlite3 = require("sqlite3");
+var cannonDB = require("./server/db");
 
 var serialPort;
 
