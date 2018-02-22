@@ -120,10 +120,10 @@
               <br/>
                 <mat-form-field>
                   <mat-label>File name</mat-label>
-                  <input matInput #fileLocation placeholder="File name">
+                  <input matInput #fileLocation [(ngModel)]="fileName" placeholder="File name">
                 </mat-form-field>
                 <button mat-button
-                (click)="fireService.saveCannonData(fileLocation.value)"
+                (click)="fireService.saveCannonData(fileName)"
               color="primary">Save
             </button>
                 <div>

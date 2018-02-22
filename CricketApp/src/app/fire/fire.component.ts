@@ -21,6 +21,7 @@ export class FireComponent implements OnInit {
   totalShots = 0;
   pressure: number = 0;
   ballNames: string[] = ["ball ID"];
+  fileName: string = "";  
 
   firstFormGroup: FormGroup;
   secondFormGroup: FormGroup;
@@ -45,7 +46,6 @@ export class FireComponent implements OnInit {
       if (that.fireService.dashCurrentShot >= that.fireService.totalShots) {
         this.toggleOff();
         this.fireService.stopCannon();
-        //this.changeStep(5);
       }
     }); 
   }
@@ -84,7 +84,7 @@ export class FireComponent implements OnInit {
   toggleOff() {
     this.toggled = false;
     this.fireService.stopCannon();
-    console.log("Finished firing session.");
+    console.log("Paused firing session.");
   }
 
 

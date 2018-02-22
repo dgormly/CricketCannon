@@ -91,7 +91,7 @@ io.on('connection', (socket) => {
           //TODO: Add to database : Ball ID, Pressure
           currentShot++;
           if (currentShot < totalShots) {
-            serialPort.write("CANNON/FIRE:" + data.pressure);
+            serialPort.write("CANNON/FIRE:" + pressure);
           } else {
             console.log("[SERVER]: Stopping cannon".red);
             serialPort.write("CANNON/STOP:");
@@ -154,7 +154,7 @@ io.on('connection', (socket) => {
   socket.on('CANNON/FIRE', function(data) {
     console.log("[SERVER]: Firing cannon.");
     //console.log(data.pressure);
-    serialPort.write("CANNON/FIRE:" + data.pressure);
+    serialPort.write("CANNON/FIRE:" + pressure);
   });
 
 
