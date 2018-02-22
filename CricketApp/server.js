@@ -80,13 +80,16 @@ io.on('connection', (socket) => {
       parser.on("data", function(data) {
         let dataType = data.split(":");
 //        console.log("DEBUG",dataType[0].trim());
-        io.sockets.emit(dataType[0].trim(), dataType[1]);
-
-        if (dataType[0] === "CANNON/RESULTS") {
-          console.log("[RESULTS]: Fire results.".cyan);
+        let header = dataType[0].trim();
+        dataType.splice(0,1);
+        let payload = dataType.join(':');
+        io.sockets.emit(header, payload);
+        if (header === "CANNON/RESULTS") {
+          console.log("[RESULTS]: Fire results: ".cyan, payload);
+          let payloadObj = JSON.parse(payload);
           shotRecord.push({
             ballid: ballNames[currentShot % ballNames.length],
-            pressure: dataType[1].pressure
+            pressure: payloadObj.PRESSURE
           });
           //TODO: Add to database : Ball ID, Pressure
           currentShot++;
@@ -97,7 +100,7 @@ io.on('connection', (socket) => {
             serialPort.write("CANNON/STOP:");
           }
         } else if (dataType[0] === "CANNON/DEBUG") {
-          console.log("[DEBUG]: ", dataType[1].yellow);
+          console.log("[DEBUG]: ", payload.yellow);
         }
 
       });

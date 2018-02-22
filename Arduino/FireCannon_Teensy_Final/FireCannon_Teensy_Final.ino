@@ -1,8 +1,8 @@
 #include <Servo.h>
 
-
-//Proportional Regulator Stuff/////////////////////////
-const int PROP_FEEDBACK = 14;
+#define BLESERIAL Serial2
+//ProBLESERIALional Regulator Stuff/////////////////////////
+#define PROP_FEEDBACK 14
                        // outside leads to ground and +5V
 int val = 0;           // variable to store the value read
 char buffer1[50];
@@ -29,7 +29,11 @@ boolean globalstop = false;
 #define SERVOBACK 21
 #define CAMERA A9
 ////////////////////////////////////////////////////
+//Ultrasonic detection variables//////////////////
 
+#define TRIG_PIN A2
+#define ECHO_PIN A1
+/////////////////////////////////////////////////
 //Laser detection variables///////////////////
 volatile long velocitydiff_1 = 0;
 volatile long velocitydiff_2 = 0;
@@ -57,6 +61,7 @@ const int LASER_3 = 9;
 const int LASER_4 = 10;
 //////////////////////////////////////////////////
 #define DACRES 12
+#define ADCRES 12
 volatile int pressurereadcounter = 0;
 volatile int timesincepressureread = 0;
 void setup()
@@ -69,15 +74,59 @@ void setup()
   backservo.attach(SERVOBACK);
   frontservo.write(175);
   backservo.write(5);
-  //Proportional Regulator Stuff
+  //ProBLESERIALional Regulator Stuff
   Serial.begin(9600);              //  setup serial
   while (!Serial);
   analogWriteResolution(DACRES);
-  analogReadResolution(12);
+  analogReadResolution(ADCRES);
   pinMode(PROP_FEEDBACK, INPUT);
   setup_lasers();
   velocitytimer.begin(velocity_manage, 100);
   interrupts();
+  //NOTE: BLESERIAL.BEGIN MUST BE AFTER THE CALL TO interrupts()!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  BLESERIAL.begin(115200);
+}
+
+
+/*returns true if a ball is stucK, else returns false
+ * 
+ */
+bool Ultrasonic_check() {
+  digitalWrite(TRIG_PIN, LOW);
+  delayMicroseconds(2);
+  digitalWrite(TRIG_PIN, HIGH);
+  delayMicroseconds(10);
+  digitalWrite(TRIG_PIN, LOW);
+  long duration = pulseIn(ECHO_PIN, HIGH, 3000); //3000 is the maximum output for 50cm measurement
+  if(duration == 0) {
+    duration = 3000;
+  }
+  float distance = duration /29 / 2;
+  if(DEBUG) {
+    Serial.println(distance);
+  }
+  if(distance < 8.0) {
+    return true;
+  }
+  return false;
+}
+
+
+void loop()
+{
+  // Wait for response
+  if(hasvelocitycaptured) {
+    String velocityoutput = "Diff1: " + String(velocitydiff_1) + "\n\rDiff2: " + String(velocitydiff_2) + "\n\rDiff3: " + String(velocitydiff_3);
+    Serial.println(velocityoutput);
+    hasvelocitycaptured = 0;
+  }
+  printpressurecycle();
+  if(state_error) {
+    Serial.printf("Error in state %d\n", state_error);
+    state_error = 0;
+  }
+  handleContact(Serial);
+  handleContact(BLESERIAL);
 }
 
 void setup_relays() {
@@ -89,6 +138,8 @@ void setup_relays() {
   pinMode(DUMP_NO, OUTPUT);
   pinMode(CLICKER, INPUT);
   pinMode(CAMERA, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+  pinMode(TRIG_PIN, OUTPUT);
 }
 
 
@@ -180,68 +231,85 @@ void setup_lasers() {
     attachInterrupt(LASER_4,laser4Detect ,RISING);
 }
 
-void loop()
-{
-  // Wait for response
-  if(hasvelocitycaptured) {
-    String velocityoutput = "Diff1: " + String(velocitydiff_1) + "\n\rDiff2: " + String(velocitydiff_2) + "\n\rDiff3: " + String(velocitydiff_3);
-    Serial.println(velocityoutput);
-    hasvelocitycaptured = 0;
-  }
-  printpressurecycle();
-  if(state_error) {
-    Serial.printf("Error in state %d\n", state_error);
-    state_error = 0;
-  }
-  handleContact();
-}
-
 void printpressurecycle(void) {
    if(pressurereadcounter > timesincepressureread + 2500) {
-    Serial.printf("CANNON/PRESSURE:%u\n",analogRead(PROP_FEEDBACK));
+    Serial.printf("CANNON/PRESSURE:%3.2f\n",floatMapToComputer(analogRead(PROP_FEEDBACK)));
     timesincepressureread = pressurereadcounter;
   }
 }
 
 String line;
 
-void handleContact() {
-  // If we get a valid byte, read analog ins:
-  // get incoming byte:
-  if(Serial.available() > 0) {
-    line = Serial.readStringUntil('/');
+void reload_ball(void) {
+  backservo.write(50);
+  delay(500);
+  backservo.write(5);
+  frontservo.write(100);
+  delay(250);
+  frontservo.write(175);
+}
+
+bool ball_has_reloaded = false;
+
+void fireSequence(float pressure) {
+  float velocity = 0;
+  if(!ball_has_reloaded) {
+    reload_ball();
+  }
+  delay(150); //to ensure ball drops in before a shot is fired assuming that the pressure is already at max
+  ball_has_reloaded = true;
+  if(communicationsIncoming())
+    return;
+  int pressurestatus = PressuriseAndWait(pressure);
+  if(pressurestatus == 2 || pressurestatus == 0) {
+    return; //comms incoming for 2, error for 0. either way want to exit
+  }
+  while(Ultrasonic_check()){
+    delay(50);
+    Serial.println("Ball in the way!");
+  }
+  float fire_psi = floatMapToComputer(analogRead(PROP_FEEDBACK));
+  fire();
+  ball_has_reloaded = false;
+  if(communicationsIncoming())
+    return;
+  ValueToReg(floatMapToReg(pressure)); //repressurise
+  //check lasers
+  //confirm ball back in hopper
+  Serial.printf("CANNON/RESULTS:{\"PRESSURE\":%3.2f, \"VELOCITY\":0}\n",fire_psi);
+}
+
+void handleContact(HardwareSerial port) {
+  if(BLESERIAL.available() > 0) {
+    line = BLESERIAL.readStringUntil('/');
     if (line == "CANNON") {
-      line = Serial.readStringUntil('/');
+      line = BLESERIAL.readStringUntil(':');
       if(line == "FIRE") {
-        line = Serial.readStringUntil('\n');
-        fire(line.toFloat());
-            
+        line = BLESERIAL.readStringUntil('\n');
+        fireSequence(line.toFloat());
       } else if (line == "AUTO") {
-        for(int i = 0; i < 40; i++) {
-          fire(90);
+        for(int i = 0; i < 20; i++) {
+          fireSequence(90);
+          if(communicationsIncoming()) {
+            return;
+          }
           delay(300);
-          backservo.write(50);
-          delay(500);
-          backservo.write(5);
-          frontservo.write(100);
-          delay(250);
-          frontservo.write(175);
         }
+        depressurise();
       } else if(line == "TEST") {
         testpropreg();
-      }
-    
-    } else if(line == "STOP") {
-      depressurise();
+      } else if(line == "STOP") {
+        depressurise();
+      } 
     } else if(line == "TESTSERVOS") {
       testservos();
     } else if(line == "SERVO") {
-      line  = Serial.readStringUntil('/');
+      line  = BLESERIAL.readStringUntil('/');
       if(line == "FRONT") {
-        line = Serial.readStringUntil('\n');
+        line = BLESERIAL.readStringUntil('\n');
         frontservo.write(line.toInt());
       } else if(line == "BACK") {
-        line = Serial.readStringUntil('\n');
+        line = BLESERIAL.readStringUntil('\n');
         backservo.write(line.toInt());        
       } else if(line == "TESTDROP") {
         frontservo.write(100);
@@ -251,6 +319,50 @@ void handleContact() {
     }
   }
 }
+
+void handleContact(usb_serial_class port) {
+  // If we get a valid byte, read analog ins:
+  // get incoming byte:
+  if(port.available() > 0) {
+    line = port.readStringUntil('/');
+    if (line == "CANNON") {
+      line = port.readStringUntil(':');
+      if(line == "FIRE") {
+        line = port.readStringUntil('\n');
+        fireSequence(line.toFloat());
+      } else if (line == "AUTO") {
+        for(int i = 0; i < 20; i++) {
+          fireSequence(90);
+          if(communicationsIncoming()) {
+            return;
+          }
+          delay(300);
+        }
+        depressurise();
+      } else if(line == "TEST") {
+        testpropreg();
+      } else if(line == "STOP") {
+        depressurise();
+      } 
+    } else if(line == "TESTSERVOS") {
+      testservos();
+    } else if(line == "SERVO") {
+      line  = port.readStringUntil('/');
+      if(line == "FRONT") {
+        line = port.readStringUntil('\n');
+        frontservo.write(line.toInt());
+      } else if(line == "BACK") {
+        line = port.readStringUntil('\n');
+        backservo.write(line.toInt());        
+      } else if(line == "TESTDROP") {
+        frontservo.write(100);
+        delay(300);
+        frontservo.write(175);
+      }
+    }
+  }
+}
+
 float globalpsi = 0;
 
 void testpropreg() {
@@ -258,13 +370,13 @@ void testpropreg() {
   float psi = line.toFloat();
   globalpsi = psi;
   float bar = psi/ 14.5038;
-  long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+  long valtodac = floatMap(bar, 0, 7, 0, pow(2, DACRES)); // Map voltage
   Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
   int reg_val;
   for(int i = 0; i < 10; i++) {
     reg_val = analogRead(PROP_FEEDBACK);
-    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
+    Serial.printf("\n\rReading from PropReg: %d Desired: %d\n\r", reg_val, valtodac);
     delay(100);
   }
   /*
@@ -273,6 +385,13 @@ void testpropreg() {
     delay(10);
   }
   */
+}
+
+bool communicationsIncoming(void) {
+  if (Serial.available() > 0) {
+    return true;
+  }
+  return false;
 }
 
 void laser1Detect() {
@@ -293,116 +412,121 @@ void laser4Detect() {
   ballhaspassed_4 = 1;
 }
 
-
-void GetPressure() {
-  Serial.write("\nEnter Pressure (PSI):");
-  message = "";
-  while(1) {
-    if(Serial.available() > 0) {  
-      char numchar = Serial.read();
-      if (numchar == '\n' || numchar == '\r') { 
-        Serial.write("\n\r");
-        int pval = message.toInt();
-        reload();
-        Pressurise(pval);
-        break;
-      } else if(numchar == -1){
-        continue;
-      }
-      else {
-        Serial.write(numchar);
-        message += numchar;
-      }
-    }
-  }
-}
-
-void fire(float psi) {
+void fire() {
   //Fire Cannon Function: Solenoid Sequence to Trigger QEV
   reload();
-  Pressurise(psi);
-  if(globalstop == true) {
-    Serial.println("Depressurising");
-    depressurise();
-    globalstop = false;
-    return;
-  }
   digitalWrite(TRIGGER_NO, HIGH);
-  Serial.println("CAMERA BEFORE");
   digitalWrite(CAMERA, HIGH);
   delay(50);
   digitalWrite(CAMERA, LOW);
-  Serial.println("CAMEA AFTER");
   delay(VALVE_DELAY);
   digitalWrite(TRIGGER_NC, HIGH);
   delay(DUMP_DELAY);
   digitalWrite(TRIGGER_NO, LOW);
   digitalWrite(TRIGGER_NC, LOW);
-  Pressurise(25);
-  Serial.println("CANNON/RESULTS:DUMMY");
 }
 
 void reload() {
   //Reload Cannon Function: Closes Tank Valve to Close QEV.
-  //delay(2000);
   digitalWrite(TANK_NO, HIGH);
   delay(TANK_DELAY);
   digitalWrite(TANK_NO, LOW);
 }
 
-#define REGTHRESHOLD 100
+#define REGTHRESHOLDTOP 300
+#define REGTHRESHOLDBOTTOM 100
 
 void depressurise() {
-  float bar;
+  float bar, regPsi;
   long valtodac;
-  int reg_val;
-  for(int i = globalpsi; i > 21.8; i--) { 
+  int reg_val, count = 0;
+  reg_val = analogRead(PROP_FEEDBACK);
+  regPsi = floatMapToComputer(reg_val);
+  for(int i = regPsi; i > 0; i--) { 
     bar = i / 14.5038;
-    valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+    valtodac = floatMap(bar, 0, 7, 0, pow(2, DACRES)); // Map voltage
     analogWrite(A14, valtodac);
-    delay(200);
+    delay(150);
     reg_val = analogRead(PROP_FEEDBACK);
-    long expected_feedback = map(valtodac, 0, pow(2, DACRES), 0 , 2800);
-    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, expected_feedback);
+    long expected_feedback = floatMap(valtodac, 0, pow(2, DACRES), 0 , 2800);
+    count++;
+    if(DEBUG && count > 4) { //forces this to only happen every 200 ms
+      Serial.printf("CANNON/DEBUG:Reading from PropReg:%d, Desired:%d\n", reg_val, expected_feedback);
+      count = 0;
+    }
   }
 }
 
-void Pressurise(float psi){
-  float bar = psi / 14.5038;
-  globalpsi = psi;
-  long valtodac = map(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
-  Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
+void ValueToReg(int valtodac) {
+  if(DEBUG)
+    Serial.println("CANNON/DEBUG:Pressurising to " + String(valtodac) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
-  bool atpressure = false;
+}
+
+
+/*
+ * Waits for pressure to reach the desired pressure, found in globalpsi that is set in the PressueToReg function
+ * returns 0 for error, 1 for at pressure, 2 for comms inbound
+ */
+int checkPressure(int valtodac) {
   int reg_val;
-  /*
-  for(int i = 0; i < 10; i++) {
-    reg_val = analogRead(PROP_FEEDBACK);
-    Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, valtodac);
-    delay(100);
-  }
-  */
+  bool atpressure = false;
+  long expected_feedback = floatMap(valtodac, 0, pow(2, DACRES), 0 , 2800);
   while(!atpressure){
-    if(Serial.available() > 0) {
-      line = Serial.readStringUntil('/');
-      if(line == "CANNON") {
-        line = Serial.readStringUntil('\n');
-        if(line == "STOP") {
-          globalstop = true;
-          return;
-        }
-      }
-    }
+    if(communicationsIncoming())
+      return 2;
     reg_val = analogRead(PROP_FEEDBACK);
-    long expected_feedback = map(valtodac, 0, pow(2, DACRES), 0 , 2800);
-    if((reg_val >= (expected_feedback - REGTHRESHOLD)) && (reg_val <= (expected_feedback + REGTHRESHOLD))) {
-      atpressure = true;
+    if((reg_val >= (expected_feedback - REGTHRESHOLDBOTTOM)) && (reg_val <= (expected_feedback + REGTHRESHOLDTOP))) {
+      return 1;
     }
     printpressurecycle();
     if(DEBUG){
-      Serial.printf("\n\rReading from PropReg: %d\n\rDesired: %d\n\r", reg_val, expected_feedback);
-      delay(50);
+      Serial.printf("CANNON/DEBUG:Reading from PropReg: %d, Desired: %d\n", reg_val, expected_feedback);
     }
+    delay(50);
+  } 
+}
+
+/*
+ * Returns an integer value necessary to get an appropriate voltage at the pressure regulator for
+ * setting PSI output
+ */
+int floatMapToReg(float psi) {
+  float bar = psi / 14.5038;
+  return floatMap(bar, 0, 7, 0, pow(2, DACRES));
+}
+
+float floatMapToComputer(int adcval) {
+  //ADC val back to bar, then taken back to PSI
+  return (floatMap(adcval, 0 , pow(2,ADCRES),0 ,7)) * 14.5038;
+}
+
+/*
+ * returns 0 for error, 1 for at pressure, 2 for comms inbound
+ */
+int PressuriseAndWait(float psi){
+  globalpsi = psi;
+  ValueToReg(floatMapToReg(psi));
+  int pressurestatus = checkPressure(floatMapToReg(psi));
+  if(pressurestatus == 2) {
+    return 2;
+  } else if (pressurestatus = 1){
+    return 1;
+  } else {
+    return 0;
   }
+}
+
+String ReadBLE() {
+    if(BLESERIAL.available() > 0) {
+      String bleread = BLESERIAL.readStringUntil('\n');
+      return bleread;
+    }
+    return "N/A";
+}
+
+float floatMap(float x, float in_min, float in_max, float out_min, float out_max)
+{
+  return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 

@@ -20,7 +20,6 @@ export class FireComponent implements OnInit {
   currentShotNum = 0;
   totalShots = 0;
   pressure: number = 0;
-  ballNames: string[] = ["ball ID"];
   fileName: string = "";  
 
   firstFormGroup: FormGroup;
@@ -41,20 +40,20 @@ export class FireComponent implements OnInit {
       thirdCtrl: ['', Validators.required]
     });
 
-    var that = this;
-    this.fireService.cannonResults$.subscribe( data => {
-      if (that.fireService.dashCurrentShot >= that.fireService.totalShots) {
-        this.toggleOff();
-        this.fireService.stopCannon();
-      }
-    }); 
+    // var that = this;
+    // this.fireService.cannonResults$.subscribe( data => {
+    //   if (that.fireService.dashCurrentShot >= that.fireService.totalShots) {
+    //     this.toggleOff();
+    //     this.fireService.stopCannon();
+    //   }
+    // }); 
   }
 
 
   reset(): void {
     this.fireService.totalShots = 0;
     this.fireService.dashCurrentShot = 0;
-    this.fireService.ballName = "";
+    this.fireService.ballNames = ["ball ID"];
     this.fireService.stopCannon();
   }
 
@@ -70,10 +69,10 @@ export class FireComponent implements OnInit {
       return;
     }
 
-    this.totalShots = this.balls * this.shots;
+    this.fireService.totalShots = this.balls * this.shots;
     var payload = {
-      ballNames: this.ballNames,
-      totalShots: this.totalShots,
+      ballNames: this.fireService.ballNames,
+      totalShots: this.fireService.totalShots,
       pressure: this.pressure,
       currentShot: this.currentShotNum
     }
@@ -89,9 +88,9 @@ export class FireComponent implements OnInit {
 
 
   setBallNum(numBrands: number) {
-    console.log('number: ', this.ballNames);
-    this.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball ID");
-    console.log(this.ballNames);
+    console.log('number: ', this.fireService.ballNames);
+    this.fireService.ballNames = Array(numBrands).fill("name").map((x,i)=>"ball ID");
+    console.log(this.fireService.ballNames);
     this.cdr.detectChanges();
   }
 

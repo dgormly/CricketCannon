@@ -8,11 +8,11 @@
           Cannon Wizard
         </mat-panel-title>
         <mat-panel-description *ngIf="fireService.dashCurrentShot > 0">
-          Next: {{ fireService.dashCurrentShot }}
+          Next: {{ this.fireService.ballNames[fireService.dashCurrentShot % this.fireService.ballNames.length] }}
           <mat-progress-bar
           color="warn"
           mode="determinate"
-          [value]="(fireService.dashCurrentShot / fireService.totalShots)"
+          [value]="(fireService.dashCurrentShot / fireService.totalShots) * 100"
           class="progress">
         </mat-progress-bar>
           {{ fireService.totalShots - fireService.dashCurrentShot }}
@@ -69,10 +69,10 @@
                       Please fill out the ball names in shooting order.
                       <br/>
                       <div class="floating-box">
-                        <div *ngFor="let ball of ballNames; let i = index trackBy:trackByFn">
+                        <div *ngFor="let ball of fireService.ballNames; let i = index trackBy:trackByFn">
                         <mat-form-field>
                           <mat-label>Ball ID</mat-label>
-                          <input matInput type="text" [(ngModel)]="ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}" formControlName="thirdCtrl" required>
+                          <input matInput type="text" [(ngModel)]="fireService.ballNames[i]" name="{{ ball }}" placeholder="{{ ball }}" formControlName="thirdCtrl" required>
                         </mat-form-field>
                         </div>
                     </div>
@@ -89,7 +89,7 @@
                     <div *ngIf="checked">
                       <br/>
                       <mat-form-field>
-                        <input matInput placeholder="Ball Name" name="singleShotName" [(ngModel)]="ballNames[0]">
+                        <input matInput placeholder="Ball Name" name="singleShotName" [(ngModel)]="fireService.ballNames[0]">
                       </mat-form-field>
                     </div>
                     <br/>

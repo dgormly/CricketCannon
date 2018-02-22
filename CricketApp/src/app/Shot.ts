@@ -1,8 +1,6 @@
 export class Shot {
-  id: number;
-  shotType: string;
-  shotCount: number;
-  name: string;
+  ballid: string;
+  shotCount: number = -1;
   force: number = -1;
   velocity: number = -1;
   displacement: number = -1;

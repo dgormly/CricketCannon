@@ -28,7 +28,7 @@ export class FireService {
 
   dashCurrentShot = 0;
   totalShots = 0;
-  ballName = "";
+  ballNames: string[] = ["ball ID"];
 
 
   private currentPressure = new BehaviorSubject<number>(0);
@@ -58,7 +58,7 @@ export class FireService {
 
     this.socket.on('PORT/SET', function(data) {
       if (data.toString() === "OK") {
-        console.log("Successfully connected scale comms");
+        console.log("Sng buiuccessfully connected scale comms");
       } else {
         console.log("Failed to connect to scale comms");
       }
@@ -71,10 +71,13 @@ export class FireService {
 
     this.socket.on('CANNON/RESULTS', function(data) {
       console.log("Cannon results - client");
-      that.cannonResults.next(data.results);
+      // get data values to add shot.
+      let payload = JSON.parse(data);
+      let ballid = that.ballNames[that.dashCurrentShot % that.ballNames.length];
+      let pressure = payload.PRESSURE;
+      console.log(data);
+      that.addShot(ballid, pressure);
       that.dashCurrentShot++;
-      that.ballName = data.ballName;
-      that.totalShots;
     });
 
     this.socket.on('SCALE/ERROR', function(data) {
@@ -122,9 +125,11 @@ export class FireService {
   }
 
 
-  private addShot(ballName: string, shot: Shot): void {
-    console.log('Shot added.');
-    shot.name = ballName;
+  private addShot(ballid: string, pressure: number): void {
+    let shot = new Shot();
+    shot.shotPressure = pressure;
+    shot.ballid = ballid;
+    console.log('Shot added. ', shot);
     this.shots.next(this.shots.getValue().concat(shot));
     this.cShots.next(this.cShots.getValue().concat(shot));
   }
