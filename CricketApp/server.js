@@ -75,14 +75,18 @@ io.on('connection', (socket) => {
         }
       });
       
+      // Clean data that comes through serialport.
       serialPort.pipe(parser);
       parser.on("data", function(data) {
         let dataType = data.split(":");
-//        console.log("DEBUG",dataType[0].trim());
+        // This is needed incase a JSON string is sent.
         let header = dataType[0].trim();
         dataType.splice(0,1);
         let payload = dataType.join(':');
+        // Forward message on to any subscribers.
         io.sockets.emit(header, payload);
+
+        // Handle CANNON results / CONVERT to JSON.
         if (header === "CANNON/RESULTS") {
           console.log("[RESULTS]: Fire results: ".cyan, payload);
           let payloadObj = JSON.parse(payload);
@@ -92,12 +96,15 @@ io.on('connection', (socket) => {
           });
           //TODO: Add to database : Ball ID, Pressure
           currentShot++;
+
+          // Stop cannon if all shots are fired ;)
           if (currentShot < totalShots) {
             serialPort.write("CANNON/FIRE:" + pressure);
           } else {
             console.log("[SERVER]: Stopping cannon".red);
             serialPort.write("CANNON/STOP:");
           }
+        // Color message if DEBUG message comes through.
         } else if (dataType[0] === "CANNON/DEBUG") {
           console.log("[DEBUG]: ", payload.yellow);
         }
@@ -132,6 +139,14 @@ io.on('connection', (socket) => {
       if (err) throw err;
       console.log('[SERVER]: File saved.');
     });
+  });
+  
+
+  /**
+   *  Clear cannon data. THIS DOES NOT REMOVE IT FROM THE DATABASE.
+   */
+  socket.on('CANNON/CLEAR', function(data) {
+    shotRecord = data;
   });
 
 

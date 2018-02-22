@@ -103,10 +103,12 @@ export class FireService {
     this.socket.emit('PORT/GET');
   }
 
-
+  setCannon(payload: any): void {
+    this.socket.emit('CANNON/SET', payload);
+  }
 
   fireCannon(payload: any): void {
-    this.socket.emit('CANNON/SET', payload);
+    this.setCannon(payload);
     this.socket.emit('CANNON/FIRE', payload.pressure);
   }
 
@@ -114,14 +116,11 @@ export class FireService {
     this.socket.emit('CANNON/STOP');
   }
 
-  isFiring(data: boolean): void {
-    this.firingSubject.next(data);
-  }
-
 
   clearShots(): void {
     console.log('Clearing shot data.');
     this.cShots.next([]);
+    this.socket.emit('CANNON/CLEAR', []);
   }
 
 

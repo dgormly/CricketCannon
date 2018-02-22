@@ -54,7 +54,14 @@ export class FireComponent implements OnInit {
     this.fireService.totalShots = 0;
     this.fireService.dashCurrentShot = 0;
     this.fireService.ballNames = ["ball ID"];
-    this.fireService.stopCannon();
+    var payload = {
+      ballNames: this.fireService.ballNames,
+      totalShots: this.fireService.totalShots,
+      pressure: this.pressure,
+      currentShot: this.currentShotNum
+    }
+
+    this.fireService.setCannon(payload);
   }
 
 
