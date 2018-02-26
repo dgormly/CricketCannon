@@ -1,5 +1,5 @@
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('../Data/Database/CricketDB.db');
+var db = new sqlite3.Database('./Data/Database/CricketDB.db');
 
 // db.serialize(function() {
 //     db.run("INSERT INTO Ball (Brand, Type) VALUES ( ?, ?)", ["Daniel", "Gormly"]);

@@ -12,7 +12,7 @@
           <mat-progress-bar
           color="warn"
           mode="determinate"
-          [value]="(fireService.dashCurrentShot / fireService.totalShots) * 100ng "
+          [value]="(fireService.dashCurrentShot / fireService.totalShots) * 100"
           class="progress">
         </mat-progress-bar>
           {{ fireService.totalShots - fireService.dashCurrentShot }}
@@ -30,9 +30,9 @@
                       </mat-select>
                     </mat-form-field>
                     <br/>
-                    <mat-checkbox [(ngModel)]="checked" [ngModelOptions]="{standalone: true}">
+                    <!-- <mat-checkbox [(ngModel)]="checked" [ngModelOptions]="{standalone: true}">
                         Single Shot
-                    </mat-checkbox>
+                    </mat-checkbox> -->
                     <br />
                     <mat-form-field>
                       <mat-label #pressureNum>Pressure: </mat-label>

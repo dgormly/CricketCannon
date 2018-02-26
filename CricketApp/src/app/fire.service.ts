@@ -39,7 +39,7 @@ export class FireService {
 
   constructor() {
     var that = this;
-    this.socket = socketIo('http://localhost:5000');
+    this.socket = socketIo();
 
     this.socket.on('SCALE/DATA', function(data) {
       let message = data.toString();

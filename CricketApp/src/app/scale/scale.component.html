@@ -32,16 +32,16 @@
             (click)="tare()" [disabled]="fireService.selectedPort == ''">
               Tare
           </button>
-          <button mat-raised-button 
+          <button mat-raised-button
           [disabled]="fileName == '' || fireService.selectedPort == '' || ballName == ''"
           color="accent"
           (click)="saveScaleData()">
           Save
-          </button>  
+          </button>
         </mat-card-actions>
   </mat-card-content>
   </mat-card>
-  
+
   <mat-card id="card-form" style="float: left; height: 250px; margin: 16px; width: 200px;">
     <mat-card-header>
       <mat-card-title>
@@ -71,5 +71,5 @@
       </mat-card-actions>
   </mat-card-content>
   </mat-card>
-      <chart #balanceChart [type]="type" [data]="data" [options]="options"></chart>
+      <!-- <chart #balanceChart [type]="type" [data]="data" [options]="options"></chart> -->
   </div>

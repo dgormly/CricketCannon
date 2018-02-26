@@ -13,7 +13,7 @@ export class ScaleComponent implements OnInit {
     fileName: string = "";
     ballName: string = "";
 
-    showData;
+    //showData;
     rw1: number[] = [];
     rw2: number[] = [];
     rw3: number[] = [];
@@ -31,31 +31,31 @@ export class ScaleComponent implements OnInit {
     sampleNo: number = 0;
     count = 0;
 
-    type = 'scatter';
-    data: {
-        datasets: [{
-            label: 'Scatter Dataset',
-            data: [{
-                x: -0.5,
-                y: 0
-            }, {
-                    x: 0,
-                    y: 0.7
-                }, {
-                    x: 0.1,
-                    y: 0.8
-                }]
-        }]
-    }
-    options: {
-        scales: {
-            xAxes: [{
-                type: 'linear',
-                position: 'bottom'
-            }]
-        }
-    }
-
+    // type = 'scatter';
+    // data: {
+    //     datasets: [{
+    //         label: 'Scatter Dataset',
+    //         data: [{
+    //             x: -0.5,
+    //             y: 0
+    //         }, {
+    //                 x: 0,
+    //                 y: 0.7
+    //             }, {
+    //                 x: 0.1,
+    //                 y: 0.8
+    //             }]
+    //     }]
+    // }
+    // options: {
+    //     scales: {
+    //         xAxes: [{
+    //             type: 'linear',
+    //             position: 'bottom'
+    //         }]
+    //     }
+    // }
+    //
 
     hasTared: Boolean;
 
