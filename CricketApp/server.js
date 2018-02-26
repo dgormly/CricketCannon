@@ -46,18 +46,38 @@ var currentShot = 0;
 var pressure = 0.0;
 var ballNames;
 var shotRecord = [""];
+var clientConnected = false;
 
 console.log("[SERVER]: Setting up sockets.");
 const io = module.exports.io = socketIo(server);
 var that = this;
 io.on('connection', (socket) => {
   console.log('[SERVER]: The client connected'.green);
-  module.exports.client = socket;
+
+  // /** Check if cannon is already in use. */
+  // if (clientConnected) {
+  //   socket.emit("SERVER/AUTH", false);
+  //   console.log("[SERVER]: Client already connected to server.".red);
+  // } else {
+  //   socket.emit("SERVER/AUTH", true);
+  //   clientConnected = true;
+  // }
 
   socket.on('PORT/GET', function() {
     SerialPort.list(function (err, ports) {
       socket.emit("PORT/GET", ports);
     });
+  });
+
+  socket.on("SERVER/AUTH", function() {
+    if (clientConnected) {
+      socket.emit("SERVER/AUTH", false);
+      console.log("[SERVER]: Client already connected to server.".red);
+    } else {
+      socket.emit("SERVER/AUTH", true);
+      clientConnected = true;
+    }
+
   });
 
   /**
@@ -209,5 +229,6 @@ io.on('connection', (socket) => {
   socket.on('disconnect', function(){
     console.log('[SERVER]: User disconnected'.red);
     serialPort = null;
+    clientConnected = false;
   });
 });

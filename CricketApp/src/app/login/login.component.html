@@ -1,13 +1,14 @@
-<mat-card>
+<mat-card style="max-width: 250px; margin: auto; margin-top: 20px;">
 <mat-card-header>
   <h1>Login</h1>
 </mat-card-header>
 <mat-form-field>
   <input #username matInput placeholder="Username">
 </mat-form-field>
-
+<br />
 <mat-form-field>
   <input #password matInput type="password" placeholder="Password">
 </mat-form-field>
+<br />
 <button mat-button color="primary" (click)="login(username, password)">Login</button>
 </mat-card>

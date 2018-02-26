@@ -6,6 +6,7 @@ import {BehaviorSubject} from 'rxjs/BehaviorSubject';
 import {tap} from 'rxjs/operators';
 import { Subject } from 'rxjs/Subject';
 import * as socketIo from 'socket.io-client';
+import { AuthService } from './auth.service';
 
 
 @Injectable()
@@ -37,7 +38,7 @@ export class FireService {
   scaleDataSubject = new BehaviorSubject<String>("");
   tareSubject = new BehaviorSubject<Boolean>(false);
 
-  constructor() {
+  constructor(private authService: AuthService) {
     var that = this;
     this.socket = socketIo();
 
@@ -46,6 +47,7 @@ export class FireService {
       that.scaleDataSubject.next(message);
     });
 
+
     this.socket.on('PORT/GET', function(data) {
       that.ports = data;
       console.log('Ports setup');
@@ -53,6 +55,15 @@ export class FireService {
 
     this.socket.on('CANNON/PRESSURE', function(data) {
       that.currentPressure.next(data);
+    });
+
+
+    this.socket.on('SERVER/AUTH', function(data) {
+      if (data == true) {
+        that.authService.isLoggedIn = true;
+      } else {
+        that.authService.isLoggedIn = false;
+      }
     });
 
 
