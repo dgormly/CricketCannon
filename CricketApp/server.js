@@ -69,16 +69,16 @@ io.on('connection', (socket) => {
     });
   });
 
-  socket.on("SERVER/AUTH", function() {
-    if (clientConnected) {
-      socket.emit("SERVER/AUTH", false);
-      console.log("[SERVER]: Client already connected to server.".red);
-    } else {
-      socket.emit("SERVER/AUTH", true);
-      clientConnected = true;
-    }
+  // socket.on("SERVER/AUTH", function() {
+  //   if (clientConnected) {
+  //     socket.emit("SERVER/AUTH", false);
+  //     console.log("[SERVER]: Client already connected to server.".red);
+  //   } else {
+  //     socket.emit("SERVER/AUTH", true);
+  //     clientConnected = true;
+  //   }
 
-  });
+  // });
 
   /**
    * Set port to use for communication.

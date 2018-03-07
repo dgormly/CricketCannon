@@ -58,13 +58,13 @@ export class FireService {
     });
 
 
-    this.socket.on('SERVER/AUTH', function(data) {
-      if (data == true) {
-        that.authService.isLoggedIn = true;
-      } else {
-        that.authService.isLoggedIn = false;
-      }
-    });
+    // this.socket.on('SERVER/AUTH', function(data) {
+    //   if (data == true) {
+    //     that.authService.isLoggedIn = true;
+    //   } else {
+    //     that.authService.isLoggedIn = false;
+    //   }
+    // });
 
 
     this.socket.on('PORT/SET', function(data) {
