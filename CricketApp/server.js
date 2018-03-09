@@ -79,7 +79,25 @@ io.on('connection', (socket) => {
         io.sockets.emit(dataType[0].trim(), dataType[1]);
 
         if (dataType[0] === "CANNON/RESULTS") {
+<<<<<<< Updated upstream
           console.log("Fire results.");
+=======
+          console.log("[RESULTS]: Fire results.".cyan);
+          shotRecord.push({
+            ballid: ballNames[currentShot % ballNames.length],
+            pressure: dataType[1].pressure
+          });
+          //TODO: Add to database : Ball ID, Pressure
+          currentShot++;
+          if (currentShot < totalShots) {
+            serialPort.write("CANNON/FIRE:" + pressure);
+          } else {
+            console.log("[SERVER]: Stopping cannon".red);
+            serialPort.write("CANNON/STOP:");
+          }
+        } else if (dataType[0] === "CANNON/DEBUG") {
+          console.log("[DEBUG]: ", dataType[1].yellow);
+>>>>>>> Stashed changes
         }
 
       });
@@ -108,9 +126,15 @@ io.on('connection', (socket) => {
   });
 
   socket.on('CANNON/FIRE', function(data) {
+<<<<<<< Updated upstream
     console.log("Firing cannon.");
     console.log(data.pressure);
     serialPort.write("CANNON/FIRE:" + data.pressure);
+=======
+    console.log("[SERVER]: Firing cannon.");
+    //console.log(data.pressure);
+    serialPort.write("CANNON/FIRE:" + pressure);
+>>>>>>> Stashed changes
   });
 
   socket.on('CANNON/STOP', function() {

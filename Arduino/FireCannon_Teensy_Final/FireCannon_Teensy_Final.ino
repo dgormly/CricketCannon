@@ -1,6 +1,6 @@
 #include <Servo.h>
 
-#define BLESERIAL Serial2
+//#define BLESERIAL Serial2
 //ProBLESERIALional Regulator Stuff/////////////////////////
 #define PROP_FEEDBACK 14
                        // outside leads to ground and +5V
@@ -11,6 +11,7 @@ int buffercount = 0;
 const bool DEBUG = true;
 Servo frontservo;
 Servo backservo;
+Servo dropservo;
 const int VALVE_DELAY = 150;
 const int DUMP_DELAY = 2000;
 const int TANK_DELAY = 1000;
@@ -21,13 +22,25 @@ boolean globalstop = false;
 #define TRIGGER_NO 1   //Relay 2
 #define TRIGGER_NC 2    //Relay 3
 #define TANK_NO 0      //Relay 1
-#define REG_NC 5        //N/A
-#define CYLINDER_NO 6    //N/A
+//#define REG_NC 5        //N/A
+//#define CYLINDER_NO 6    //N/A
+#define SS_2 5
+#define SS_3 6
 #define DUMP_NO 3        //Relay 4
-#define CLICKER 4
+//#define CLICKER 4
+#define TANK_NO_SS 4
 #define SERVOFRONT 20      // A6
 #define SERVOBACK 21
+#define SERVODROP 22
 #define CAMERA A9
+
+
+void reloadsingle() {
+  digitalWrite(TANK_NO_SS, HIGH);
+  delay(TANK_DELAY);
+  digitalWrite(TANK_NO_SS, LOW);
+}
+
 ////////////////////////////////////////////////////
 //Ultrasonic detection variables//////////////////
 
@@ -55,10 +68,10 @@ volatile uint64_t timer_counter;
 #define THIRD 3
 volatile byte velocity_state = IDLING;
 //Pin assignments
-const int LASER_1 = 7;
-const int LASER_2 = 8;
-const int LASER_3 = 9;
-const int LASER_4 = 10;
+const int LASER_1 = 8;
+const int LASER_2 = 9;
+const int LASER_3 = 10;
+const int LASER_4 = 11;
 //////////////////////////////////////////////////
 #define DACRES 12
 #define ADCRES 12
@@ -72,19 +85,20 @@ void setup()
   pinMode(13, OUTPUT); 
   frontservo.attach(SERVOFRONT);
   backservo.attach(SERVOBACK);
-  frontservo.write(175);
-  backservo.write(5);
-  //ProBLESERIALional Regulator Stuff
+  dropservo.attach(SERVODROP);
+  dropservo.write(10);
+  frontservo.write(120);
+  backservo.write(40);
   Serial.begin(9600);              //  setup serial
   while (!Serial);
   analogWriteResolution(DACRES);
   analogReadResolution(ADCRES);
   pinMode(PROP_FEEDBACK, INPUT);
   setup_lasers();
-  velocitytimer.begin(velocity_manage, 100);
+  velocitytimer.begin(velocity_manage, 100); 
   interrupts();
   //NOTE: BLESERIAL.BEGIN MUST BE AFTER THE CALL TO interrupts()!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  BLESERIAL.begin(115200);
+  //BLESERIAL.begin(115200);
 }
 
 
@@ -99,13 +113,13 @@ bool Ultrasonic_check() {
   digitalWrite(TRIG_PIN, LOW);
   long duration = pulseIn(ECHO_PIN, HIGH, 3000); //3000 is the maximum output for 50cm measurement
   if(duration == 0) {
-    duration = 3000;  
+    duration = 3000;
   }
   float distance = duration /29 / 2;
   if(DEBUG) {
     Serial.println(distance);
   }
-  if(distance < 25.0) {
+  if(distance < 8.0) {
     return true;
   }
   return false;
@@ -120,30 +134,41 @@ void loop()
     Serial.println(velocityoutput);
     hasvelocitycaptured = 0;
   }
+  if(ballhaspassed_1) {
+    Serial.println("passed first");
+    ballhaspassed_1 = 0;
+  }
+  if(ballhaspassed_2) {
+    Serial.println("passed second");
+    ballhaspassed_2 = 0;
+  }
   printpressurecycle();
   if(state_error) {
     Serial.printf("Error in state %d\n", state_error);
     state_error = 0;
   }
   handleContact(Serial);
-  handleContact(BLESERIAL);
+  //handleContact(BLESERIAL);
 }
 
 void setup_relays() {
   pinMode(TRIGGER_NO, OUTPUT);
   pinMode(TRIGGER_NC, OUTPUT);
   pinMode(TANK_NO, OUTPUT);
-  pinMode(REG_NC, OUTPUT);
-  pinMode(CYLINDER_NO, OUTPUT);
+  //pinMode(REG_NC, OUTPUT);
+  //pinMode(CYLINDER_NO, OUTPUT);
+  pinMode(TANK_NO_SS,OUTPUT);
+  pinMode(SS_2, OUTPUT);
+  pinMode(SS_3,OUTPUT);
   pinMode(DUMP_NO, OUTPUT);
-  pinMode(CLICKER, INPUT);
+  //pinMode(CLICKER, INPUT);
   pinMode(CAMERA, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
   pinMode(TRIG_PIN, OUTPUT);
 }
 
-
 void velocity_manage() {
+  /*
   if(velocity_state == IDLING) {
     if(ballhaspassed_1) {
       velocity_state = FIRST;
@@ -155,9 +180,17 @@ void velocity_manage() {
     }
   } else if(velocity_state == FIRST){
     if(ballhaspassed_2) {
+    */
+      /*
       velocity_state = SECOND;
       velocitydiff_1 = timer_counter - velocitycapture_1;
       velocitycapture_2 = timer_counter;
+      */
+      /*
+      velocity_state = IDLING;
+      velocitydiff_1 = timer_counter - velocitycapture_1;
+      ballhaspassed_1 = 0;
+      hasvelocitycaptured = 1;
     }
     
     if(ballhaspassed_3 || ballhaspassed_4) {
@@ -203,6 +236,7 @@ void velocity_manage() {
       state_error = 4;
     }
   }
+  */
   timer_counter++;
   pressurereadcounter++;
 }
@@ -241,12 +275,12 @@ void printpressurecycle(void) {
 String line;
 
 void reload_ball(void) {
-  backservo.write(50);
-  delay(500);
-  backservo.write(5);
-  frontservo.write(100);
-  delay(250);
-  frontservo.write(175);
+  backservo.write(80);
+  delay(300);
+  backservo.write(40);
+  frontservo.write(70);
+  delay(400);
+  frontservo.write(120);
 }
 
 bool ball_has_reloaded = false;
@@ -266,8 +300,11 @@ void fireSequence(float pressure) {
   }
   while(Ultrasonic_check()){
     delay(50);
+    if(communicationsIncoming())
+      return;
     Serial.println("Ball in the way!");
   }
+  float fire_psi = floatMapToComputer(analogRead(PROP_FEEDBACK));
   fire();
   ball_has_reloaded = false;
   if(communicationsIncoming())
@@ -275,9 +312,10 @@ void fireSequence(float pressure) {
   ValueToReg(floatMapToReg(pressure)); //repressurise
   //check lasers
   //confirm ball back in hopper
-  Serial.printf("CANNON/RESULTS:{'PRESSURE':%3.2f, VELOCITY}\n",floatMapToComputer(analogRead(PROP_FEEDBACK)));
+  Serial.printf("CANNON/RESULTS:{\"PRESSURE\":%3.2f, \"VELOCITY\":0}\n",fire_psi);
 }
 
+/*
 void handleContact(HardwareSerial port) {
   if(BLESERIAL.available() > 0) {
     line = BLESERIAL.readStringUntil('/');
@@ -319,6 +357,7 @@ void handleContact(HardwareSerial port) {
   }
 }
 
+*/
 void handleContact(usb_serial_class port) {
   // If we get a valid byte, read analog ins:
   // get incoming byte:
@@ -329,6 +368,8 @@ void handleContact(usb_serial_class port) {
       if(line == "FIRE") {
         line = port.readStringUntil('\n');
         fireSequence(line.toFloat());
+      } else if(line == "TESTRELOAD") {
+        reload_ball();
       } else if (line == "AUTO") {
         for(int i = 0; i < 20; i++) {
           fireSequence(90);
@@ -342,7 +383,30 @@ void handleContact(usb_serial_class port) {
         testpropreg();
       } else if(line == "STOP") {
         depressurise();
-      } 
+      }  else if(line == "SINGLE") {
+        line = port.readStringUntil('\n'); //only there so then we can have newline end of command functionality
+        ValueToReg(floatMapToReg(line.toFloat()));
+        delay(13000);
+        if(!communicationsIncoming()){
+          Serial.println("FIRING");
+          firesingle();       
+        }
+        delay(200);
+        depressurise();
+      } else if(line == "DROP") {
+        line = port.readStringUntil('\n');
+        if(line == "READY") {
+          dropservo.write(20);
+        } else if( line == "FIRE") {
+          digitalWrite(CAMERA, HIGH);
+          delay(50);
+          digitalWrite(CAMERA, LOW);
+          delay(350);
+          dropservo.write(10);        
+        } else if(line == "DROP") {
+          dropservo.write(10);
+        }
+      }
     } else if(line == "TESTSERVOS") {
       testservos();
     } else if(line == "SERVO") {
@@ -353,10 +417,9 @@ void handleContact(usb_serial_class port) {
       } else if(line == "BACK") {
         line = port.readStringUntil('\n');
         backservo.write(line.toInt());        
-      } else if(line == "TESTDROP") {
-        frontservo.write(100);
-        delay(300);
-        frontservo.write(175);
+      } else if(line == "DROP") {
+        line = port.readStringUntil('\n');
+        dropservo.write(line.toInt());
       }
     }
   }
@@ -369,7 +432,7 @@ void testpropreg() {
   float psi = line.toFloat();
   globalpsi = psi;
   float bar = psi/ 14.5038;
-  long valtodac = floatMap(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+  long valtodac = floatMap(bar, 0, 7, 0, pow(2, DACRES)); // Map voltage
   Serial.println("Pressurising to " + String(psi) + " with DAC value " + String(valtodac));
   analogWrite(A14, valtodac);
   int reg_val;
@@ -425,6 +488,19 @@ void fire() {
   digitalWrite(TRIGGER_NC, LOW);
 }
 
+void firesingle() {
+  reloadsingle();
+  digitalWrite(SS_2, HIGH);
+  digitalWrite(CAMERA, HIGH);
+  delay(50);
+  digitalWrite(CAMERA, LOW);
+  delay(VALVE_DELAY);
+  digitalWrite(SS_3, HIGH);
+  delay(DUMP_DELAY);
+  digitalWrite(SS_2, LOW);
+  digitalWrite(SS_3, LOW);
+}
+
 void reload() {
   //Reload Cannon Function: Closes Tank Valve to Close QEV.
   digitalWrite(TANK_NO, HIGH);
@@ -432,18 +508,21 @@ void reload() {
   digitalWrite(TANK_NO, LOW);
 }
 
+
 #define REGTHRESHOLDTOP 300
 #define REGTHRESHOLDBOTTOM 100
 
 void depressurise() {
-  float bar;
+  float bar, regPsi;
   long valtodac;
   int reg_val, count = 0;
-  for(int i = globalpsi; i > 21.8; i--) { 
+  reg_val = analogRead(PROP_FEEDBACK);
+  regPsi = floatMapToComputer(reg_val);
+  for(int i = regPsi; i > 0; i--) { 
     bar = i / 14.5038;
-    valtodac = floatMap(bar, 1.5, 7, 0, pow(2, DACRES)); // Map voltage
+    valtodac = floatMap(bar, 0, 7, 0, pow(2, DACRES)); // Map voltage
     analogWrite(A14, valtodac);
-    delay(300);
+    delay(150);
     reg_val = analogRead(PROP_FEEDBACK);
     long expected_feedback = floatMap(valtodac, 0, pow(2, DACRES), 0 , 2800);
     count++;
@@ -490,12 +569,12 @@ int checkPressure(int valtodac) {
  */
 int floatMapToReg(float psi) {
   float bar = psi / 14.5038;
-  return floatMap(bar, 1.5, 7, 0, pow(2, DACRES));
+  return floatMap(bar, 0, 7, 0, pow(2, DACRES));
 }
 
 float floatMapToComputer(int adcval) {
   //ADC val back to bar, then taken back to PSI
-  return (floatMap(adcval, 0 , pow(2,ADCRES),1.5 ,7)) * 14.5038;
+  return (floatMap(adcval, 0 , pow(2,ADCRES),0 ,7)) * 14.5038;
 }
 
 /*
@@ -514,6 +593,7 @@ int PressuriseAndWait(float psi){
   }
 }
 
+/*
 String ReadBLE() {
     if(BLESERIAL.available() > 0) {
       String bleread = BLESERIAL.readStringUntil('\n');
@@ -521,6 +601,7 @@ String ReadBLE() {
     }
     return "N/A";
 }
+*/
 
 float floatMap(float x, float in_min, float in_max, float out_min, float out_max)
 {
