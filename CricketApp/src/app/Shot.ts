@@ -2,9 +2,10 @@ export class Shot {
   ballid: string;
   shotCount: number = -1;
   force: number = -1;
-  velocity: number = -1;
+  vin: number = -1;
+  vout: number = -1;
   displacement: number = -1;
-  shotPressure: number;
+  shotPressure: number = -1;
 }
 
 export class Scale {

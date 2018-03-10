@@ -110,12 +110,18 @@ io.on('connection', (socket) => {
         if (header === "CANNON/RESULTS") {
           console.log("[RESULTS]: Fire results: ".cyan, payload);
           let payloadObj = JSON.parse(payload);
-          shotRecord.push({
+          record = {
             ballid: ballNames[currentShot % ballNames.length],
-            pressure: payloadObj.PRESSURE
-          });
-          //TODO: Add to database : Ball ID, Pressure
+            pressure: payloadObj.PRESSURE,
+            vin: payloadObj.VIN,
+            vout: payloadObj.VOUT
+          };
+
+          shotRecord.push(record);
+          // Add to database : Ball ID, Pressure
+          cannonDB.addShot(record);
           currentShot++;
+          console.log("Shot recorded.");
 
           // Stop cannon if all shots are fired ;)
           if (currentShot < totalShots) {
@@ -228,7 +234,10 @@ io.on('connection', (socket) => {
    */
   socket.on('disconnect', function(){
     console.log('[SERVER]: User disconnected'.red);
-    serialPort = null;
-    clientConnected = false;
+    if (serialPort != null && serialPort.isOpen) {
+      serialPort.close();
+      //clientConnected = false;
+      console.log('[SERVER]: Closed Serialport.'.green);
+    }
   });
 });

@@ -84,10 +84,8 @@ export class FireService {
       console.log("Cannon results - client");
       // get data values to add shot.
       let payload = JSON.parse(data);
-      let ballid = that.ballNames[that.dashCurrentShot % that.ballNames.length];
-      let pressure = payload.PRESSURE;
-      console.log(data);
-      that.addShot(ballid, pressure);
+      console.log(payload);
+      that.addShot(payload);
       that.dashCurrentShot++;
     });
 
@@ -135,10 +133,12 @@ export class FireService {
   }
 
 
-  private addShot(ballid: string, pressure: number): void {
+  private addShot(shotData): void {
     let shot = new Shot();
-    shot.shotPressure = pressure;
-    shot.ballid = ballid;
+    shot.shotPressure = shotData.PRESSURE;
+    shot.ballid = this.ballNames[this.dashCurrentShot % this.ballNames.length];
+    shot.vin = shotData.VIN;
+    shot.vout = shotData.VOUT;
     console.log('Shot added. ', shot);
     this.shots.next(this.shots.getValue().concat(shot));
     this.cShots.next(this.cShots.getValue().concat(shot));
@@ -165,7 +165,7 @@ export class FireService {
   saveCannonData(fileName: string): void {
     this.socket.emit('CANNON/SAVE', {
       name: fileName,
-      headers:  ['ballid', 'pressure']
+      headers:  ['ballid', 'pressure', 'vin', 'vout']
     });
   }
 

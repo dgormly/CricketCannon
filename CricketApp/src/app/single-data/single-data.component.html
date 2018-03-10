@@ -1,0 +1,62 @@
+<div class="table-container">
+  <span class="filter">
+    <mat-form-field>
+      <input matInput placeholder="Filter" (keyup)="applyFilter($event.target.value)">
+    </mat-form-field>
+    <button mat-raised-button color="warn" (click)="removeSelectedRows()" [disabled]="dataSource.data.length <= 0" class="deleteBtn">
+        Delete
+    </button>
+  </span>
+  <mat-table #table [dataSource]="dataSource">
+
+    <!--- Note that these columns can be defined in any order.
+          The actual rendered columns are set as a property on the row definition" -->
+
+    <!-- Checkbox Column -->
+    <ng-container matColumnDef="select">
+      <mat-header-cell *matHeaderCellDef>
+        <mat-checkbox (change)="$event ? masterToggle() : null" [checked]="selection.hasValue() && isAllSelected()" [indeterminate]="selection.hasValue() && !isAllSelected()">
+        </mat-checkbox>
+      </mat-header-cell>
+      <mat-cell *matCellDef="let row">
+        <mat-checkbox (click)="$event.stopPropagation()" (change)="$event ? selection.toggle(row) : null" [checked]="selection.isSelected(row)">
+        </mat-checkbox>
+      </mat-cell>
+    </ng-container>
+
+    <!-- Id Column -->
+    <ng-container matColumnDef="No.">
+      <mat-header-cell *matHeaderCellDef> No. </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.sampleNo}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="ball">
+      <mat-header-cell *matHeaderCellDef> Ball ID </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.ball}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="rw1">
+      <mat-header-cell *matHeaderCellDef> Pressure </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw1}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="rw2">
+      <mat-header-cell *matHeaderCellDef> Vin </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw2}} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="rw3">
+      <mat-header-cell *matHeaderCellDef> Vout </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.rw3}} </mat-cell>
+    </ng-container>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="sum">
+      <mat-header-cell *matHeaderCellDef> Displacement </mat-header-cell>
+      <mat-cell *matCellDef="let scale"> {{scale.sum}} </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>

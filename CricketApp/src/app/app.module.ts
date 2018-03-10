@@ -24,6 +24,8 @@ import { AuthService } from './auth.service';
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ChartModule } from 'angular2-chartjs';
+import { SingleComponent } from './single/single.component';
+import { SingleDataComponent } from './single-data/single-data.component';
 //import {NgbModule} from '@ng-bootstrap/ng-bootstrap';
 
 
@@ -36,7 +38,9 @@ import { ChartModule } from 'angular2-chartjs';
     ScaleComponent,
     LoginComponent,
     DashboardComponent,
-    ScaleDataComponent
+    ScaleDataComponent,
+    SingleComponent,
+    SingleDataComponent
   ],
   imports: [
     FormsModule,

@@ -9,9 +9,9 @@ var db = new sqlite3.Database('./Data/Database/CricketDB.db');
 //     });
 // });
 
-exports.addShot = function(ballid, pressure) {
+exports.addShot = function(record) {
     db.serialize(function() {
-        db.run("INSERT INTO Shot (Ballid, Pressure) VALUES ( ?, ?)", [ballid, pressure]);
+        db.run("INSERT INTO Shot (Ballid, Pressure, Vin, Vout) VALUES ( ?, ?, ?, ?)", [record.ballid, record.pressure, record.vin, record.vout]);
     });
-    db.close();
+    //db.close();
 }

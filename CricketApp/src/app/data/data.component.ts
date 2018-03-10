@@ -16,7 +16,7 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 export class DataComponent implements OnInit {
 
   dataSource: MatTableDataSource<any>;
-  displayedColumns = ['ballid', 'pressure'];
+  displayedColumns = ['ballid', 'pressure', 'vin', 'vout'];
   @Input() allData = true;
   @ViewChild(MatPaginator) paginator: MatPaginator;
 

@@ -16,10 +16,20 @@
       <mat-cell *matCellDef="let shot"> {{ shot.ballid }} </mat-cell>
     </ng-container>
 
-    <!-- Name Column -->
+    <!-- Pressure Column -->
     <ng-container matColumnDef="pressure">
       <mat-header-cell *matHeaderCellDef> Pressure </mat-header-cell>
       <mat-cell *matCellDef="let shot"> {{ shot.shotPressure }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="vin">
+      <mat-header-cell *matHeaderCellDef> Vin </mat-header-cell>
+      <mat-cell *matCellDef="let shot"> {{ shot.vin }} </mat-cell>
+    </ng-container>
+
+    <ng-container matColumnDef="vout">
+      <mat-header-cell *matHeaderCellDef> Vout </mat-header-cell>
+      <mat-cell *matCellDef="let shot"> {{ shot.vout }} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
