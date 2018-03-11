@@ -69,6 +69,14 @@ io.on('connection', (socket) => {
     });
   });
 
+
+  socket.on('PORT/CLOSE', function() {
+    if (serialPort != null && serialPort.isOpen) {
+      serialPort.close();
+      console.log('[SERVER]: Successfully closed Comm port.');
+    }
+  });
+
   // socket.on("SERVER/AUTH", function() {
   //   if (clientConnected) {
   //     socket.emit("SERVER/AUTH", false);
@@ -205,7 +213,7 @@ io.on('connection', (socket) => {
    * Stop Cannon.
    */
   socket.on('CANNON/STOP', function() {
-    if (serialPort) {
+    if (serialPort != null && serialPort.isOpen) {
       serialPort.write("CANNON/STOP:");
       console.log("[SERVER]: Stopping cannon.".red);
     }

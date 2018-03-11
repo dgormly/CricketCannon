@@ -108,6 +108,10 @@ export class FireService {
     });
   }
 
+  closeComm() {
+    this.socket.emit('PORT/CLOSE');
+  }
+
   getPorts() {
     this.socket.emit('PORT/GET');
   }
