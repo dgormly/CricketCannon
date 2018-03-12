@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { FireService } from '../fire.service';
 
 @Component({
   selector: 'app-single',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SingleComponent implements OnInit {
 
-  constructor() { }
+  constructor(public fireService: FireService) { }
 
   ngOnInit() {
   }

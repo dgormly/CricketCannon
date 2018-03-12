@@ -1,1 +1,46 @@
-<p>Coming soon!</p>
+<mat-card id="card-form" style="margin: auto; margin-top: 16px; width: 400px;">
+  <mat-card-header>
+    <mat-card-title>
+      Single Shot / Drop Test
+    </mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+      <mat-form-field>
+          <mat-select placeholder="Comm Port" [(value)]="fireService.selectedPort" (click)="fireService.getPorts();" (change)="fireService.setPort(fireService.selectedPort, 9600)">
+            <mat-option *ngFor="let port of fireService.ports" [value]="port.comName">
+              {{ port.comName }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-raised-button color="warn" (click)="fireService.closeComm()" [disabled]="fireService.selectedPort != ''">
+            Disconnect
+          </button>
+        <br />
+      <mat-form-field>
+          <mat-label>Ball ID</mat-label>
+          <input matInput placeholder="Ball ID">
+        </mat-form-field>
+        <button mat-raised-button>
+            Ready
+          </button>
+          <button mat-raised-button color="primary">
+            Drop
+          </button>
+        <br />  
+    <mat-form-field>
+      <mat-label>Pressure</mat-label>
+      <input matInput placeholder="Pressure">
+    </mat-form-field>
+    <button mat-raised-button color="warn">
+        Fire
+      </button>
+      <hr>
+      <mat-form-field>
+        <mat-label>File Name</mat-label>
+        <input matInput placeholder="File Name">
+      </mat-form-field>
+      <button mat-raised-button color="accent">
+          Save
+        </button>
+  </mat-card-content>
+</mat-card>

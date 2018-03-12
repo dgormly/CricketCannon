@@ -11,7 +11,7 @@ For the software to run, please install nodejs from nodejs.org.
 3. Files are saved in ``` CricketApp/Data/Scale```
 
 Note:  
-The scale must be running the firmware found in ``` scale/3psJavaComm ``` and the serial monitor in Arduino MUST be closed.
+The scale must be runni	ng the firmware found in ``` scale/3psJavaComm ``` and the serial monitor in Arduino MUST be closed.
 
 ## Calibrating the Scale
 To calibrate the scale you will need to change the firmware on the scale. The calibration will then save the settings into the EEPROM.
