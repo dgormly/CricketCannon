@@ -26,7 +26,7 @@ export class FireComponent implements OnInit {
   secondFormGroup: FormGroup;
   thirdFormGroup: FormGroup;
 
-  constructor(private fireService: FireService, private _formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
+  constructor(public fireService: FireService, private _formBuilder: FormBuilder, private cdr: ChangeDetectorRef) {
 
   }
   ngOnInit() {

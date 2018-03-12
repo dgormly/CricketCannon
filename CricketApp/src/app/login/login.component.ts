@@ -13,7 +13,7 @@ import * as socketIo from 'socket.io-client';
 export class LoginComponent {
   message: string;
 
-  constructor(private fireService: FireService, public authService: AuthService, public router: Router) {
+  constructor(public fireService: FireService, public authService: AuthService, public router: Router) {
     this.setMessage();
   }
 

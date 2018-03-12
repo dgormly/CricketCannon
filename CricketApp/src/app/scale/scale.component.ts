@@ -59,7 +59,7 @@ export class ScaleComponent implements OnInit {
 
     hasTared: Boolean;
 
-    constructor(private fireService: FireService) {
+    constructor(public fireService: FireService) {
     }
 
 

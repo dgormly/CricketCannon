@@ -1,1 +1,1 @@
-npm install && ng build
+./server/node-v8.10.0-win-x64/npm.cmd install && ./server/node-v8.10.0-win-x64/node.exe ./node_modules/@angular/cli/bin/ng build --prod
