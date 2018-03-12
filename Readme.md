@@ -1,6 +1,7 @@
 # Software
 ## How to install the desktop software
-1. Navigate to the the CricketApp folder.
+For the software to run, please install nodejs from nodejs.org.  
+1. Navigate to the the CricketApp folder.  
 2. (Optional) If this is the first time running the software on the computer run ```Install.bat```. This may take sometime to download the dependancies.
 
 
@@ -21,7 +22,7 @@ To calibrate the scale you will need to change the firmware on the scale. The ca
 4. Open the Serial terminal and follow instructions ``` Tools -> Serial Monitor ```
 
 Note:  
-The server must be shut down to allow the arduino software to access the COMM ports.
+You must disconnect from the comm port for the Arduino software. Press the disconnect button found on under the scale tab.  
 If the upload button can't find the required libraries. Under the sketch menu select ``` include library -> manage libraries ``` and install the missing library that it is asking for. 
 If the software states that the COMM is busy, shut down the server command prompt.
 If the software can not find the correct COMM, select ``` Tools -> Port -> Arduino/Uno ```.
