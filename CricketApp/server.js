@@ -15,7 +15,7 @@ var serialPort;
 
 // Parsers
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false}));
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Angular DIST output folder
 app.use(express.static(path.join(__dirname, 'dist')));
@@ -63,14 +63,14 @@ io.on('connection', (socket) => {
   //   clientConnected = true;
   // }
 
-  socket.on('PORT/GET', function() {
+  socket.on('PORT/GET', function () {
     SerialPort.list(function (err, ports) {
       socket.emit("PORT/GET", ports);
     });
   });
 
 
-  socket.on('PORT/CLOSE', function() {
+  socket.on('PORT/CLOSE', function () {
     if (serialPort != null && serialPort.isOpen) {
       serialPort.close();
       console.log('[SERVER]: Successfully closed Comm port.');
@@ -91,66 +91,66 @@ io.on('connection', (socket) => {
   /**
    * Set port to use for communication.
    */
-  socket.on('PORT/SET', function(data) {
+  socket.on('PORT/SET', function (data) {
     let parser = new Readline();
     console.log("[SERVER]: Setting up comm with baud ", data.baud);
-      serialPort = new SerialPort(data.port, {
-        baudRate: data.baud
-      }, function(err) {
-        if (err) {
-          socket.emit('PORT/ERROR', 'Error on connecting to port.');
-          return console.log(colors.red('[SERVER]: Error on connecting to port: ', err.message));
+    serialPort = new SerialPort(data.port, {
+      baudRate: data.baud
+    }, function (err) {
+      if (err) {
+        socket.emit('PORT/ERROR', 'Error on connecting to port.');
+        return console.log(colors.red('[SERVER]: Error on connecting to port: ', err.message));
+      }
+    });
+
+    // Clean data that comes through serialport.
+    serialPort.pipe(parser);
+    parser.on("data", function (data) {
+      let dataType = data.split(":");
+      // This is needed incase a JSON string is sent.
+      let header = dataType[0].trim();
+      dataType.splice(0, 1);
+      let payload = dataType.join(':');
+      // Forward message on to any subscribers.
+      io.sockets.emit(header, payload);
+
+      // Handle CANNON results / CONVERT to JSON.
+      if (header === "CANNON/RESULTS") {
+        console.log("[RESULTS]: Fire results: ".cyan, payload);
+        let payloadObj = JSON.parse(payload);
+        record = {
+          ballid: ballNames[currentShot % ballNames.length],
+          pressure: payloadObj.PRESSURE,
+          vin: payloadObj.VIN,
+          vout: payloadObj.VOUT
+        };
+
+        shotRecord.push(record);
+        // Add to database : Ball ID, Pressure
+        cannonDB.addShot(record);
+        currentShot++;
+        console.log("Shot recorded.");
+
+        // Stop cannon if all shots are fired ;)
+        if (currentShot < totalShots) {
+          serialPort.write("CANNON/FIRE:" + pressure);
+        } else {
+          console.log("[SERVER]: Stopping cannon".red);
+          serialPort.write("CANNON/STOP:");
         }
-      });
-      
-      // Clean data that comes through serialport.
-      serialPort.pipe(parser);
-      parser.on("data", function(data) {
-        let dataType = data.split(":");
-        // This is needed incase a JSON string is sent.
-        let header = dataType[0].trim();
-        dataType.splice(0,1);
-        let payload = dataType.join(':');
-        // Forward message on to any subscribers.
-        io.sockets.emit(header, payload);
-
-        // Handle CANNON results / CONVERT to JSON.
-        if (header === "CANNON/RESULTS") {
-          console.log("[RESULTS]: Fire results: ".cyan, payload);
-          let payloadObj = JSON.parse(payload);
-          record = {
-            ballid: ballNames[currentShot % ballNames.length],
-            pressure: payloadObj.PRESSURE,
-            vin: payloadObj.VIN,
-            vout: payloadObj.VOUT
-          };
-
-          shotRecord.push(record);
-          // Add to database : Ball ID, Pressure
-          cannonDB.addShot(record);
-          currentShot++;
-          console.log("Shot recorded.");
-
-          // Stop cannon if all shots are fired ;)
-          if (currentShot < totalShots) {
-            serialPort.write("CANNON/FIRE:" + pressure);
-          } else {
-            console.log("[SERVER]: Stopping cannon".red);
-            serialPort.write("CANNON/STOP:");
-          }
         // Color message if DEBUG message comes through.
-        } else if (dataType[0] === "CANNON/DEBUG") {
-          console.log("[DEBUG]: ", payload.yellow);
-        }
+      } else if (dataType[0] === "CANNON/DEBUG") {
+        console.log("[DEBUG]: ", payload.yellow);
+      }
 
-      });
+    });
   });
 
 
   /**
    * Reset 3pt. scale.
    */
-  socket.on('SCALE/TARE', function(data) {
+  socket.on('SCALE/TARE', function (data) {
     serialPort.write('t');
   });
 
@@ -158,28 +158,28 @@ io.on('connection', (socket) => {
   /**
    * Save Scale data to csv.
    */
-  socket.on('SCALE/SAVE', function(scaleData) {
+  socket.on('SCALE/SAVE', function (scaleData) {
     console.log('[SERVER]: Printing CSV:');
-  
+
     var csvString = json2csv(
       {
         data: scaleData.data,
         fields: scaleData.headers
-    });
-    csvString = csvString.replace('[','');
-    
-    csvString = csvString.replace(']','');
-    fs.writeFile("./Data/Scale/" + scaleData.name + ".csv", csvString, function(err) {
+      });
+    csvString = csvString.replace('[', '');
+
+    csvString = csvString.replace(']', '');
+    fs.writeFile("./Data/Scale/" + scaleData.name + ".csv", csvString, function (err) {
       if (err) throw err;
       console.log('[SERVER]: File saved.');
     });
   });
-  
+
 
   /**
    *  Clear cannon data. THIS DOES NOT REMOVE IT FROM THE DATABASE.
    */
-  socket.on('CANNON/CLEAR', function(data) {
+  socket.on('CANNON/CLEAR', function (data) {
     shotRecord = data;
   });
 
@@ -189,7 +189,7 @@ io.on('connection', (socket) => {
    * 
    * data holds ballNames, totalShots, pressure, and currentShot
    */
-  socket.on('CANNON/SET', function(data) {
+  socket.on('CANNON/SET', function (data) {
     console.log("[CANNON]: Setting cannon settings.".green);
     ballNames = data.ballNames;
     totalShots = data.totalShots;
@@ -209,10 +209,31 @@ io.on('connection', (socket) => {
   });
 
 
+  /** Ready Drop test */
+  socket.on('CANNON/DROP:READY', function(data) {
+    serialPort.write("CANNON/DROP:READY");
+  });
+
+  socket.on('CANNON/SINGLE', function(data) {
+    serialPort.write("CANNON/SINGLE:" + data)
+  });
+
+  /** Drop ball */
+  socket.on('CANNON/DROP:FIRE', function (data) {
+    serialPort.write("CANNON/DROP:FIRE");
+  });
+
+  /** Ready Drop test */
+  socket.on('CANNON/DROP:DROP', function (data) {
+    serialPort.write("CANNON/DROP:DROP");
+  });
+
+
+
   /**
    * Stop Cannon.
    */
-  socket.on('CANNON/STOP', function() {
+  socket.on('CANNON/STOP', function () {
     if (serialPort != null && serialPort.isOpen) {
       serialPort.write("CANNON/STOP:");
       console.log("[SERVER]: Stopping cannon.".red);
@@ -222,15 +243,15 @@ io.on('connection', (socket) => {
   /**
    * Save cannon data to CSV.
    */
-  socket.on('CANNON/SAVE', function(data) {
+  socket.on('CANNON/SAVE', function (data) {
     var csvString = json2csv(
       {
         data: shotRecord,
         fields: data.headers
-    });
-    csvString = csvString.replace('[','');
-    csvString = csvString.replace(']','');
-    fs.writeFile("./Data/Cannon/" + data.name + ".csv", csvString, function(err) {
+      });
+    csvString = csvString.replace('[', '');
+    csvString = csvString.replace(']', '');
+    fs.writeFile("./Data/Cannon/" + data.name + ".csv", csvString, function (err) {
       if (err) throw err;
       console.log('[SERVER]: File saved.');
     });
@@ -240,7 +261,7 @@ io.on('connection', (socket) => {
   /**
    * Client disconnects from port and clears serial com.
    */
-  socket.on('disconnect', function(){
+  socket.on('disconnect', function () {
     console.log('[SERVER]: User disconnected'.red);
     if (serialPort != null && serialPort.isOpen) {
       serialPort.close();

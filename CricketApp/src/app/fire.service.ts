@@ -129,6 +129,23 @@ export class FireService {
     this.socket.emit('CANNON/STOP');
   }
 
+  readyDrop(): void {
+    this.socket.emit('CANNON/DROP:READY');
+  }
+
+  fireDrop(): void {
+    this.socket.emit('CANNON/DROP:FIRE');
+  }
+
+  // No camera trigger
+  dropDrop(): void {
+    this.socket.emit('CANNON/DROP:DROP');
+  }
+
+  fireSingle(psi): void {
+    this.socket.emit('CANNON/SINGLE', psi);
+  }
+
 
   clearShots(): void {
     console.log('Clearing shot data.');

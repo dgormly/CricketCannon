@@ -1,4 +1,4 @@
-<mat-card id="card-form" style="margin: auto; margin-top: 16px; width: 400px;">
+<mat-card id="card-form" style="margin: auto; margin-top: 16px; width: 350px;">
   <mat-card-header>
     <mat-card-title>
       Single Shot / Drop Test
@@ -15,23 +15,28 @@
         <button mat-raised-button color="warn" (click)="fireService.closeComm()" [disabled]="fireService.selectedPort != ''">
             Disconnect
           </button>
-        <br />
+        <hr>
       <mat-form-field>
           <mat-label>Ball ID</mat-label>
           <input matInput placeholder="Ball ID">
         </mat-form-field>
-        <button mat-raised-button>
+        <button mat-button (click)="fireService.readyDrop()">
             Ready
           </button>
-          <button mat-raised-button color="primary">
+          <br />
+          <button mat-raised-button (click)="fireService.dropDrop()">
             Drop
           </button>
+          <button mat-raised-button color="primary" (click)="fireService.dropDrop()">
+              Drop w/ Camera
+            </button>
         <br />  
+        <br />
     <mat-form-field>
       <mat-label>Pressure</mat-label>
-      <input matInput placeholder="Pressure">
+      <input matInput placeholder="Pressure" [(ngModel)]="dropPressure">
     </mat-form-field>
-    <button mat-raised-button color="warn">
+    <button mat-raised-button color="warn" (click)="fireService.fireSingle(dropPressure)">
         Fire
       </button>
       <hr>

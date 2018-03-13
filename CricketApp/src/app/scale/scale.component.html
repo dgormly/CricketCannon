@@ -27,7 +27,7 @@
       </mat-form-field>
       <br />
       <mat-card-actions style="margin: 0 auto;">
-        <button mat-raised-button color="primary" (click)="tare()" [disabled]="fireService.selectedPort == ''">
+        <button mat-raised-button color="primary" (click)="tare()">
           Tare
         </button>
         <button mat-raised-button [disabled]="fileName == '' || fireService.selectedPort == '' || ballName == ''" color="accent"
